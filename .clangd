@@ -1,0 +1,4 @@
+CompileFlags:
+  Compiler: /opt/homebrew/bin/g++-15
+  Add:
+    - -std=c++17
