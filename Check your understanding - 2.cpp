@@ -21,7 +21,21 @@ int main() {
     else {
         cout << "Senior Citizen";
     }
-}
 
-// 2. Take input of 3 numbers x, y, z and output the maximum
-// using if statements
+    // 2. Take input of 3 numbers x, y, z and output the maximum
+    // using if statements
+
+    int x, y, z;
+    cin >> x >> y >> z;
+
+    if (x > y && x > z) {
+        cout << "x is highest";
+    }
+
+    else if (y > x && y > z) {
+        cout << "y is highest";
+    }
+
+    else
+        cout << "z is highest";
+}
