@@ -66,4 +66,10 @@ int main() {
 // 3. ++
 
 
-// 4. --
+// ==============Conditions and Relational Operators=================
+// Conditions return a boolean value depending on whether
+// the expression is true or false.
+// Conditional operators:
+// ==, !=
+// Relational operators:
+// <, >, <=, >=
