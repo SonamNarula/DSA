@@ -10,3 +10,7 @@
 // "X * Y = multiplication result" without quotes.
 // "X - Y = subtraction result" without quotes.
 
+#include<bits/stdc++.h>
+using namespace std;
+
+int main()
