@@ -1,0 +1,1 @@
+{"name":"Local: C","url":"/Users/sonamnarula/Desktop/CP/CODEFORCES SHEET 1/C.SimpleCalculator.cpp","tests":[{"id":1779023849564,"input":"5 10\n","output":"5 + 10 = 15\n5 * 10 = 50\n5 - 10 = -5\n"}],"interactive":false,"memoryLimit":1024,"timeLimit":3000,"srcPath":"/Users/sonamnarula/Desktop/CP/CODEFORCES SHEET 1/C.SimpleCalculator.cpp","group":"local","local":true}
