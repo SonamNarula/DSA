@@ -1,0 +1,1 @@
+{"name":"Local: O","url":"/Users/sonamnarula/Desktop/CP/CODEFORCES/O. Calculator.cpp","tests":[{"id":1779152596898,"input":"7+54\n","output":"61"},{"id":1779152605406,"input":"17*10\n","output":"170\n"}],"interactive":false,"memoryLimit":1024,"timeLimit":3000,"srcPath":"/Users/sonamnarula/Desktop/CP/CODEFORCES/O. Calculator.cpp","group":"local","local":true}
