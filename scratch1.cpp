@@ -4,6 +4,8 @@ int main() {
     cout << "Hello world!" << endl;
 }
 
+ // dfghjkl
+
 // =============Constants in C++=====================
 // • Integer constants: 4 | 62 | -90
 // • Decimal constants: 3.14 | 12.0 | 0.33333
