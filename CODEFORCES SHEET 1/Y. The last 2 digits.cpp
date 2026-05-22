@@ -15,14 +15,34 @@
 // Output
 // Print the last 2 digits from their Multiplication.
 
+// #include <bits/stdc++.h>
+// using namespace std;
+
+// int main() {
+//     long long A, B, C, D;
+//     cin >> A >> B >> C >> D;
+
+//     long long result = (A % 100) * (B % 100) * (C % 100) * (D % 100);
+//     result %= 100;
+//     cout << result;
+// }
+
 #include <bits/stdc++.h>
 using namespace std;
 
 int main() {
+
     long long A, B, C, D;
     cin >> A >> B >> C >> D;
 
-    long long result = (A % 100) * (B % 100) * (C % 100) * (D % 100);
-    result %= 100;
-    cout << result;
+    long long result = 1;
+
+    result = (result * (A % 100)) % 100;
+    result = (result * (B % 100)) % 100;
+    result = (result * (C % 100)) % 100;
+    result = (result * (D % 100)) % 100;
+
+    cout << setw(2) << setfill('0') << result;
+
+    return 0;
 }
