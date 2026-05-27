@@ -4,14 +4,22 @@ using namespace std;
 
 class Teacher {
     // properties/attributes
+
+   private:
+    double salary;
+
    public:
     string name;
     string dept;
     string subject;
-    double salary;
 
     // methods / member functions
     void changeDept(string newDept) { dept = newDept; }
+    // setter
+    void setSalary(double s) { salary = s; }
+
+    // getter
+    double getSalary() { return salary; }
 };
 
 int main() {
@@ -20,7 +28,10 @@ int main() {
     t1.name = "sonam";
     t1.subject = "C++";
     t1.dept = "CSE";
-    t1.salary = 20000;
+    t1.setSalary(20000);
 
-    cout << t1.name;
+    cout << t1.name << endl;
+    cout << t1.getSalary() << endl;
+
+    return 0;
 }
