@@ -1,41 +1,111 @@
-# ⚡ dsa-reloaded
-
-> New IDs. New intent. Restarting for real this time — proper revision, proper grind.
-> Created fresh LeetCode and Codeforces accounts to rebuild from the ground up.
-> This time it's not just practice — it's placement prep, and I'm here to kill it. 🎯
-
----
-
-## 📊 Stats
-
 <div align="center">
 
-<table>
-  <tr>
-    <td align="center">
-      <b>🟡 LeetCode — sonamnarula</b><br><br>
-      <a href="https://leetcode.com/u/sonamnarula/">
-        <img src="https://leetcard.jacoblin.cool/sonamnarula?theme=dark&font=Baloo+2&ext=heatmap" alt="LeetCode Stats" />
-      </a>
-    </td>
-    <td align="center">
-      <b>🔵 Codeforces — sonammnarula24</b><br><br>
-      <a href="https://codeforces.com/profile/sonammnarula24">
-        <img src="https://img.shields.io/badge/Codeforces-sonammnarula24-1F8ACB?style=for-the-badge&logo=codeforces&logoColor=white" alt="Codeforces" />
-      </a>
-      <br><br>
-      <i>Stats card will appear after first contest 🚀</i>
-    </td>
-  </tr>
-</table>
+<img width="100%" src="https://capsule-render.vercel.app/api?type=waving&color=0:0a0a0f,40:0f0e1a,100:0a0a0f&height=220&section=header&text=DSA%20Reloaded&fontSize=68&fontColor=a89bc2&animation=fadeIn&fontAlignY=52&desc=clarity+comes+from+repetition%2C+not+revelation&descAlignY=73&descColor=4a4560&descSize=14" />
 
 </div>
 
+<br/>
+
+<div align="center">
+
+```
+third year ended  ·  slate wiped  ·  restart initiated
+```
+
+</div>
+
+<br/>
+<br/>
+
+## `about`
+
+Third year is done. The slate is clean.
+
+This repository marks the restart — slower this time, more deliberate.
+Fundamentals first. Pattern recognition over memorization.
+The goal is not to grind problems. The goal is to think better.
+
+New accounts. Fresh submissions. No carry-over noise.
+Building from zero, correctly.
+
+<br/>
+
+## `what lives here`
+
+```
+leetcode/          →  problem solutions
+codeforces/        →  contest submissions + upsolves
+patterns/          →  topic-wise DSA
+practice/          →  implementation drills
+```
+
+<br/>
+
+## `competitive programming`
+
+Contests run on a fixed schedule. No skipping.
+Every missed problem gets upsolve treatment — attempted fully before reading the editorial.
+Implementation is drilled separately from logic.
+Speed comes after accuracy, not before.
+
+The editorial is the last step, not the first.
+
+<br/>
+
+## `philosophy`
+
+```
+typing is not thinking.
+staring at the problem for ten minutes is.
+```
+
+A solution understood completely is worth more than five solutions copied and half-understood.
+
+Wrong answers are data. Read them like logs, not failures.
+Trace through once. Find the break. Fix the assumption.
+
+Fundamentals don't expire. Tricks do.
+The programmer who knows *why* always outlasts the one who knows *how.*
+
+```
+disappear → study → return → commit → repeat
+```
+
+<br/>
+
+## `arsenal`
+
+<br/>
+
+<div align="center">
+
+<img src="https://skillicons.dev/icons?i=cpp,git&theme=dark" />
+
+<br/><br/>
+
+<img src="https://img.shields.io/badge/LeetCode-ghostcommit-1e1b2e?style=for-the-badge&logo=leetcode&logoColor=FFA116&labelColor=0f0e1a" />
+&nbsp;
+<img src="https://img.shields.io/badge/Codeforces-ghostcommit.cpp-1e1b2e?style=for-the-badge&logo=codeforces&logoColor=a89bc2&labelColor=0f0e1a" />
+
+</div>
+
+<br/>
+<br/>
+
+<div align="center">
+
+[`leetcode / ghostcommit`](https://leetcode.com/u/ghostcommit/) &nbsp;&nbsp;`·`&nbsp;&nbsp; [`codeforces / ghostcommit.cpp`](https://codeforces.com/profile/ghostcommit.cpp)
+
+</div>
+
+<br/>
+
 ---
 
-## 🔗 Profiles
+<div align="center">
+<br/>
+<sub>closed the notebook. opened a new one.</sub>
+<br/><br/>
+</div>
 
-| Platform | Username | Link |
-|----------|----------|------|
-| 🟡 LeetCode | sonamnarula | [leetcode.com/u/sonamnarula](https://leetcode.com/u/sonamnarula/) |
-| 🔵 Codeforces | sonammnarula24 | [codeforces.com/profile/sonammnarula24](https://codeforces.com/profile/sonammnarula24) |
+<img width="100%" src="https://capsule-render.vercel.app/api?type=waving&color=0:0a0a0f,40:0f0e1a,100:0a0a0f&height=120&section=footer&animation=fadeIn" />
