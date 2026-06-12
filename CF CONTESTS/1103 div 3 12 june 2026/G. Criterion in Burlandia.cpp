@@ -4,7 +4,7 @@
 
 using namespace std;
 
-// DFS to compute depths, parent table, and up[u][b] (closest ancestor with bit b set)
+
 void dfs(int u, int p, const vector<int>& a, const vector<vector<int>>& adj, 
          vector<int>& depth, vector<vector<int>>& parent, vector<vector<int>>& up) {
          
@@ -29,7 +29,7 @@ void dfs(int u, int p, const vector<int>& a, const vector<vector<int>>& adj,
     }
 }
 
-// Computes Lowest Common Ancestor (LCA) using binary lifting
+
 int get_lca(int u, int v, const vector<int>& depth, const vector<vector<int>>& parent) {
     if (depth[u] < depth[v]) {
         swap(u, v);
@@ -79,7 +79,6 @@ void solve() {
         
         int lca = get_lca(x, y, depth, parent);
         
-        // Collect left non-zero nodes from x up to LCA (excluding LCA)
         vector<int> left_nodes;
         int curr = x;
         while (true) {
@@ -97,7 +96,7 @@ void solve() {
             curr = parent[next_node][0];
         }
         
-        // Collect right non-zero nodes from y up to LCA (excluding LCA)
+
         vector<int> right_nodes;
         curr = y;
         while (true) {
@@ -115,9 +114,8 @@ void solve() {
             curr = parent[next_node][0];
         }
         
-        // Merge nodes in order of their occurrence on the path x -> y
         int k = depth[x] + depth[y] - 2 * depth[lca] + 1;
-        vector<pair<int, int>> w; // Stores pairs of {path_index, value}
+        vector<pair<int, int>> w; 
         
         for (int node : left_nodes) {
             int pos = depth[x] - depth[node] + 1;
@@ -135,13 +133,13 @@ void solve() {
         
         int p = w.size();
         if (p == 0) {
-            // Path contains only zeros, so all subsegments are valid
+
             long long ans = (long long)k * (k + 1) / 2;
             cout << ans << "\n";
             continue;
         }
         
-        // Compute the next occurrence of shared bits
+
         vector<int> first_occ(20, k + 1);
         vector<int> next_pos(p, k + 1);
         for (int j = p - 1; j >= 0; j--) {
@@ -163,14 +161,14 @@ void solve() {
             }
         }
         
-        // Compute suffix minimums of R(l)
+
         vector<int> R_nz(p, k + 1);
         R_nz[p - 1] = next_pos[p - 1] - 1;
         for (int j = p - 2; j >= 0; j--) {
             R_nz[j] = min(R_nz[j + 1], next_pos[j] - 1);
         }
         
-        // Perform sum over all intervals
+
         long long total_sum_R = (long long)(k - w[p - 1].first) * k;
         for (int j = 0; j < p; j++) {
             long long len = w[j].first - (j > 0 ? w[j - 1].first : 0);

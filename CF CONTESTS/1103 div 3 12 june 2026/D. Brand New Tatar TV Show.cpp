@@ -29,8 +29,7 @@ void solve() {
     }
     
     int m = v.size();
-    vector<int> dp(m, 0); // 1 for Win (W), 0 for Loss (L)
-    
+    vector<int> dp(m, 0); 
     int R = m - 1;
     int num_L = 0; 
     

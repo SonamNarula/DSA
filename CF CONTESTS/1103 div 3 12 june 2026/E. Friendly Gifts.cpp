@@ -13,11 +13,9 @@ void solve() {
         cin >> a[i];
     }
     
-    // good_segs[len] stores pairs of {starting_index, min_value} for valid good subarrays
     vector<vector<pair<int, int>>> good_segs(n / 2 + 1);
     
-    // last_seen tracks the last index where a value appeared to check for duplicates
-    // Using start index 'l' as the marker avoids clearing it in O(n) every time
+   
     vector<int> last_seen(n + 1, -1);
     
     for (int l = 0; l < n; l++) {
@@ -28,7 +26,7 @@ void solve() {
         for (int r = l; r < n; r++) {
             if (r > l) {
                 if (last_seen[a[r]] == l) {
-                    // Duplicate found, we cannot expand further
+
                     break;
                 }
                 last_seen[a[r]] = l;
@@ -50,7 +48,7 @@ void solve() {
     vector<int> min_start(n + 2, 1e9);
     vector<int> modified;
     
-    // Check lengths from max possible (n/2) down to 1
+
     for (int len = n / 2; len >= 1; len--) {
         auto& S = good_segs[len];
         if (S.empty()) {
@@ -64,7 +62,7 @@ void solve() {
             int r_l = S[R_ptr].first;
             int r_v = S[R_ptr].second;
             
-            // Add elements to active set if they satisfy the non-overlapping constraint
+
             while (L_ptr < S.size() && S[L_ptr].first + len <= r_l) {
                 int l_v = S[L_ptr].second;
                 if (min_start[l_v] == 1e9) {
@@ -74,7 +72,7 @@ void solve() {
                 L_ptr++;
             }
             
-            // Check if we have a match
+
             if (r_v - len >= 1 && min_start[r_v - len] != 1e9) {
                 found = true;
                 break;
@@ -85,7 +83,7 @@ void solve() {
             }
         }
         
-        // Reset min_start values for the next iteration
+
         for (int v : modified) {
             min_start[v] = 1e9;
         }
