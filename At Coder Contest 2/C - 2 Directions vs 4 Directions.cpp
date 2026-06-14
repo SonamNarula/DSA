@@ -4,7 +4,7 @@
 
 using namespace std;
 
-const long long INF = 1e18;
+const long long INF = 1000000000000000000LL;
 
 void solve() {
     int n;
@@ -17,7 +17,7 @@ void solve() {
         }
     }
     
-    // cost[i][j] = A_{i, j-1} + A_{i, j+1}
+    // cost[i][j] represents A_{i, j-1} + A_{i, j+1} (ignoring out-of-bounds)
     vector<vector<long long>> cost(n + 1, vector<long long>(n + 1, 0));
     for (int i = 1; i <= n; i++) {
         for (int j = 1; j <= n; j++) {
