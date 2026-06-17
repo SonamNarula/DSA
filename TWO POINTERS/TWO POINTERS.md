@@ -1,526 +1,194 @@
-# Two Pointers
+# Complete Two Pointers Roadmap
 
-> Pattern Category: Arrays & Strings
+> Follow this order.
 >
-> Difficulty: Easy → Hard
->
-> Importance: ⭐⭐⭐⭐⭐
->
-> Time Complexity Goal: Usually O(n)
+> Goal: Pattern Recognition → Problem Solving → Revision
 
 ---
 
-# Table of Contents
+# Level 0 — Warmup
 
-1. What is Two Pointers?
-2. Why Do We Use It?
-3. Pattern Recognition
-4. Types of Two Pointers
-5. Core Templates
-6. Problem Roadmap
-7. Common Observations
-8. Common Mistakes
-9. Interview Notes
-10. Revision Checklist
+These build basic left-right pointer intuition.
+
+- [ ] 344. Reverse String
+- [ ] 125. Valid Palindrome
+- [ ] 9. Palindrome Number
+- [ ] 167. Two Sum II - Input Array Is Sorted
 
 ---
 
-# 1. What is Two Pointers?
+# Level 1 — Slow & Fast Pointer
 
-Two Pointers is a technique where two indices move through an array or string in a controlled way to reduce unnecessary work.
+Learn in-place array modification.
 
-Instead of:
+## Pattern
 
-for(int i=0;i<n;i++)
-{
-    for(int j=0;j<n;j++)
-    {
-    }
-}
+text slow = answer position  fast = traversal pointer 
 
-we intelligently move two pointers and often reduce complexity from:
+Problems:
 
-O(n²)
-↓
-O(n)
+- [ ] 26. Remove Duplicates from Sorted Array
+- [ ] 27. Remove Element
+- [ ] 283. Move Zeroes
+- [ ] 905. Sort Array By Parity
 
 ---
 
-# 2. Why Do We Use It?
+# Level 2 — Opposite Ends
 
-Two Pointers helps when:
+Learn pointer movement logic.
 
-- Array is sorted
-- String needs comparison from both ends
-- Pair/Triplet sum is required
-- In-place modification is needed
-- Window boundaries need tracking
-- Greedy pairing is involved
+## Pattern
 
----
+text left = 0  right = n-1 
 
-# 3. Pattern Recognition
+Problems:
 
-Whenever you see:
-
-### Sorted Array
-
-Find pair
-Find triplet
-Target sum
-
-Think:
-
-Two Sum II
-
-which usually means:
-
-Two Pointers
+- [ ] 680. Valid Palindrome II
+- [ ] 977. Squares of a Sorted Array
+- [ ] 11. Container With Most Water
+- [ ] 881. Boats to Save People
 
 ---
 
-### Palindrome
+# Level 3 — Greedy + Two Pointers
 
-Compare first and last character
+## Pattern
 
-Think:
+text Sort  Lightest + Heaviest 
 
-Left + Right Pointer
+Problems:
 
----
+- [ ] CSES Ferris Wheel
+- [ ] 881. Boats to Save People
 
-### Remove Duplicates
+Observation:
 
-Modify array in-place
-
-Think:
-
-Slow Fast Pointer
+text If lightest + heaviest cannot fit, heaviest must go alone. 
 
 ---
 
-### Pairing Problems
+# Level 4 — Sort + Two Pointers
 
-Weights
-Boats
-People
-Capacity
+## Pattern
 
-Think:
+text Fix One Element  Apply Two Sum II 
 
-Greedy + Two Pointers
+Problems:
 
----
-
-# 4. Types of Two Pointers
+- [ ] CSES Sum of Two Values
+- [ ] CSES Sum of Three Values
+- [ ] 15. 3Sum
+- [ ] 16. 3Sum Closest
 
 ---
 
-## Type 1: Opposite Ends
+# Level 5 — Advanced Sort + Two Pointers
 
-Pointers start from opposite ends.
+## Pattern
 
-int left = 0;
-int right = n - 1;
+text Fix Two Elements  Apply Two Sum 
 
-Move inward.
+Problems:
 
----
-
-### Visual
-
-1 2 3 4 5
-
-↑       ↑
-L       R 
+- [ ] 18. 4Sum
+- [ ] 611. Valid Triangle Number
 
 ---
 
-### Used In
+# Level 6 — Advanced Interview Problems
 
-- Two Sum II
+Problems:
+
+- [ ] 42. Trapping Rain Water
+- [ ] 986. Interval List Intersections
+- [ ] 1498. Number of Subsequences That Satisfy the Given Sum Condition
+
+---
+
+# Pattern Cheat Sheet
+
+## Opposite Ends
+
+Problems:
+
+- Reverse String
 - Valid Palindrome
 - Valid Palindrome II
-- Reverse String
 - Squares of Sorted Array
 - Container With Most Water
 - Trapping Rain Water
 
----
+Template:
 
-## Type 2: Slow Fast Pointer
-
-One pointer traverses.
-
-Another stores answer.
-
-int slow = 0;
-
-for(int fast=0; fast<n; fast++)
-{
-}
+cpp int left = 0; int right = n - 1;  while(left < right) {     // process      left++;     right--; } 
 
 ---
 
-### Visual
+## Slow Fast Pointer
 
-1 1 2 2 3
-
-S
-F
-
----
-
-### Used In
+Problems:
 
 - Remove Duplicates
-- Move Zeroes
 - Remove Element
-- Sort Array by Parity
+- Move Zeroes
+
+Template:
+
+cpp int slow = 0;  for(int fast = 0; fast < n; fast++) {     if(condition)     {         nums[slow] = nums[fast];         slow++;     } } 
 
 ---
 
-## Type 3: Sort + Two Pointers
+## Sort + Two Pointers
 
-Sort first.
+Problems:
 
-Fix one element.
-
-Apply Two Sum.
-
----
-
-### Visual
-
-Fix i
-
-i L       R
-↓ ↓       ↓
-1 2 3 4 5 6
-
----
-
-### Used In
-
+- Sum of Three Values
 - 3Sum
 - 3Sum Closest
 - 4Sum
-- Sum of Three Values (CSES)
+
+Template:
+
+cpp sort(nums.begin(), nums.end());  for(int i = 0; i < n; i++) {     int left = i + 1;     int right = n - 1;      while(left < right)     {     } } 
 
 ---
 
-## Type 4: Greedy + Two Pointers
-
-Sort.
-
-Pair:
-
-Lightest + Heaviest
-
----
-
-### Used In
-
-- Ferris Wheel
-- Boats to Save People
-
----
-
-# 5. Core Templates
-
----
-
-## Template 1: Opposite Ends
-
-int left = 0;
-int right = n - 1;
-
-while(left < right)
-{
-    if(condition)
-    {
-        left++;
-    }
-    else
-    {
-        right--;
-    }
-}
-
----
-
-## Template 2: Slow Fast
-
-int slow = 0;
-
-for(int fast = 0; fast < n; fast++)
-{
-    if(condition)
-    {
-        nums[slow] = nums[fast];
-        slow++;
-    }
-}
-
----
-
-## Template 3: Sort + Two Sum
-
-sort(nums.begin(), nums.end());
-
-for(int i=0;i<n;i++)
-{
-    int left = i + 1;
-    int right = n - 1;
-
-    while(left < right)
-    {
-    }
-}
-
----
-
-# 6. Problem Roadmap
-
----
-
-## Level 0: Warmup
-
-### Reverse String
-
-Concept:
-
-Swap from both ends.
-
----
-
-### Palindrome Number
-
-Concept:
-
-Compare mirrored positions.
-
----
-
-## Level 1: Basic Opposite Ends
-
-### Two Sum II
-
-Observation:
-
-Array sorted.
-
-Rule:
-
-sum < target → left++
-
-sum > target → right--
-
----
-
-### Valid Palindrome
-
-Observation:
-
-text Mismatch → false 
-
----
-
-### Valid Palindrome II
-
-Observation:
-
-Mismatch → false
-
-Rule:
-
-Skip left
-OR
-Skip right
-
----
-
-## Level 2: Slow Fast Pointer
-
-### Remove Duplicates
-
-Concept:
-
-text slow = position of next unique element 
-
----
-
-### Move Zeroes
-
-Concept:
-
-Bring all non-zero elements forward.
-
----
-
-### Remove Element
-
-Concept:
-
-Keep valid elements only.
-
----
-
-## Level 3: Advanced Opposite Ends
-
-### Squares of Sorted Array
-
-Observation:
-
-Largest square always comes from ends.
-
-Technique:
-
-Fill answer from back.
-
----
-
-### Container With Most Water
-
-Observation:
-
-Move smaller height pointer.
-
-Reason:
-
-Area depends on minimum height.
-
----
-
-## Level 4: Greedy + Two Pointers
-
-### Ferris Wheel (CSES)
-
-Observation:
-
-Heavy child is hardest to place.
-
-Rule:
-
-Lightest + Heaviest
-
-If not possible:
-
-Heaviest goes alone.
-
----
-
-### Boats to Save People
-
-Same pattern.
-
----
-
-## Level 5: Sort + Two Pointers
-
-### Sum of Three Values (CSES)
-
-Concept:
-
-
-Fix One
-
-Apply Two Sum II
-
-
----
-
-### 3Sum
-
-Concept:
-
-Fix One
-
-Find remaining two
-
----
-
-### 3Sum Closest
-
-Concept:
-
-Track nearest answer.
-
----
-
-### 4Sum
-
-Concept:
-
-Fix Two
-
-Apply Two Sum
-
----
-
-## Level 6: Advanced
-
-### Trapping Rain Water
-
-Observation:
-
-Water depends on smaller boundary.
-
----
-
-### Valid Triangle Number
-
-Observation:
-
-Sort + Two Pointers
-
----
-
-# 7. Common Observations
-
----
+# Most Important Observations
 
 ## Two Sum II
 
-Sorted array
-↓
-Two Pointers
+text sum < target → left++  sum > target → right-- 
 
 ---
 
 ## Valid Palindrome
 
-Compare from ends
+text Mismatch → false 
 
 ---
 
 ## Valid Palindrome II
 
-First mismatch
-
-Skip left
-OR
-Skip right
+text First mismatch  Skip left OR Skip right 
 
 ---
 
 ## Squares of Sorted Array
 
-Largest square
-=
-Either end
+text Largest square always comes from ends. 
 
 ---
 
 ## Container With Most Water
 
-text Move smaller height. 
+text Move the smaller height pointer. 
 
 ---
 
 ## Ferris Wheel
 
-Move smaller height.
+text Lightest + Heaviest 
 
 ---
 
@@ -530,88 +198,36 @@ text Fix One + Two Sum II
 
 ---
 
-# 8. Common Mistakes
+## Trapping Rain Water
+
+text Water depends on smaller boundary. 
 
 ---
 
-### Two Sum II
+# Blind Revision Set
 
-❌ Using HashMap
+These must be solvable without hints.
 
-Array already sorted.
+## Core
 
----
-
-### Remove Duplicates
-
-❌ Returning wrong pointer.
-
----
-
-### Valid Palindrome
-
-❌ Forgetting special character handling.
-
----
-
-### Valid Palindrome II
-
-❌ Skipping both characters together.
-
----
-
-### 3Sum
-
-❌ Forgetting duplicate skipping.
-
----
-
-### Ferris Wheel
-
-❌ Trying all pairs.
-
----
-
-# 9. Interview Notes
-
-Most interview questions are combinations of:
-
-text Opposite Ends + Slow Fast + Sorting 
-
-Important progression:
-
-text Two Sum II ↓ Valid Palindrome ↓ Move Zeroes ↓ Squares of Sorted Array ↓ Container With Most Water ↓ 3Sum ↓ Trapping Rain Water 
-
----
-
-# 10. Revision Checklist
-
-## Must Solve Without Help
-
-### Basics
-
-- [ ] Reverse String
-- [ ] Valid Palindrome
 - [ ] Two Sum II
-
-### Slow Fast
-
+- [ ] Valid Palindrome
 - [ ] Remove Duplicates
 - [ ] Move Zeroes
-- [ ] Remove Element
-
-### Medium
-
 - [ ] Valid Palindrome II
 - [ ] Squares of Sorted Array
+
+---
+
+## Medium
+
 - [ ] Container With Most Water
-
-### Greedy
-
 - [ ] Ferris Wheel
 - [ ] Boats to Save People
 
-### Advanced
+---
+
+## Advanced
 
 - [ ] Sum of Three Values
 - [ ] 3Sum
@@ -620,8 +236,61 @@ text Two Sum II ↓ Valid Palindrome ↓ Move Zeroes ↓ Squares of Sorted Array
 
 ---
 
+# CRT / Placement Priority
+
+If placements started tomorrow:
+
+1. Two Sum II
+2. Valid Palindrome
+3. Remove Duplicates
+4. Move Zeroes
+5. Valid Palindrome II
+6. Squares of Sorted Array
+7. Container With Most Water
+8. Ferris Wheel
+9. Sum of Three Values
+10. 3Sum
+11. Trapping Rain Water
+
+---
+
+# Final Mastery Checklist
+
+## Opposite Ends
+
+- [ ] Reverse String
+- [ ] Valid Palindrome
+- [ ] Valid Palindrome II
+- [ ] Squares of Sorted Array
+- [ ] Container With Most Water
+
+## Slow Fast Pointer
+
+- [ ] Remove Duplicates
+- [ ] Remove Element
+- [ ] Move Zeroes
+
+## Greedy + Two Pointers
+
+- [ ] Ferris Wheel
+- [ ] Boats to Save People
+
+## Sort + Two Pointers
+
+- [ ] Sum of Three Values
+- [ ] 3Sum
+- [ ] 3Sum Closest
+- [ ] 4Sum
+
+## Advanced
+
+- [ ] Trapping Rain Water
+- [ ] Valid Triangle Number
+
+---
+
 # Final Mental Model
 
 text Two Sum II ↓ Valid Palindrome ↓ Move Zeroes ↓ Squares of Sorted Array ↓ Container With Most Water ↓ Ferris Wheel ↓ 3Sum ↓ Trapping Rain Water 
 
-If you can solve all of these without hints, your Two Pointers foundation is strong.
+Master these problems and you will have a strong Two Pointers foundation for interviews, online assessments, and competitive programming.
