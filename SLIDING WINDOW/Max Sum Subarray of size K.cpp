@@ -1,5 +1,5 @@
 class Solution {
-   public:
+public:
     int maxSubarraySum(vector<int>& arr, int k) {
         // code here
         int WindowSum = 0;
