@@ -1,0 +1,22 @@
+# Ignore compiled binaries
+*.bin
+*_test
+b_test
+c_test
+e_rect_test
+f_test
+g_test
+d_test
+a_test
+a
+
+# Ignore test inputs
+input.txt
+g_input.txt
+b_input.txt
+c_input.txt
+e_input.txt
+f_input.txt
+
+# Ignore Competitive Programming Helper temp files
+.cph/
