@@ -1,17 +1,26 @@
-// Squares of a Sorted Array | Brute Force (Square + Sort)
-
 class Solution {
 public:
     vector<int> sortedSquares(vector<int>& nums) {
+        int n = nums.size();
         
-        // Step 1: Square all elements
-        for(int i = 0; i < nums.size(); i++){
-            nums[i] = nums[i] * nums[i];
+        vector<int> result(n);
+        
+        int i = 0, j = n-1;
+        int k = n-1;
+        
+        while(k >= 0) {
+            int a = nums[i]*nums[i];
+            int b = nums[j]*nums[j];
+            
+            if(a > b) {
+                result[k] = a;
+                i++;
+            } else {
+                result[k] = b;
+                j--;
+            }
+            k--;
         }
-
-        // Step 2: Sort the array
-        sort(nums.begin(), nums.end());
-
-        return nums; 
+        return result;
     }
 };
