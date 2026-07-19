@@ -144,7 +144,7 @@ int main() {
                     for (const auto& item : right_group[s2]) {
                         if (!(item.mask & (1 << v_right))) {
                             filtered_right[s2].push_back(item.val);
-                        }
+                        }a
                     }
                 }
             }

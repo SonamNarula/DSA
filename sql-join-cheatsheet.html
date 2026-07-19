@@ -1,0 +1,4405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Ultimate SQL JOIN Decision Cheat Sheet</title>
+  <meta name="description" content="A comprehensive, interactive, offline-first cheat sheet for mastering SQL Joins. Designed for interview preparation, exams, and developers.">
+  <style>
+    /* -------------------------------------------------------------
+       1. Core Styling & Design System (Notion + Linear + Apple)
+       ------------------------------------------------------------- */
+    :root {
+      --bg-color: #09090b;
+      --card-bg: rgba(24, 24, 27, 0.7);
+      --card-bg-solid: #18181b;
+      --border-color: rgba(63, 63, 70, 0.4);
+      --border-color-active: rgba(255, 255, 255, 0.15);
+      --text-color: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --text-dark: #71717a;
+      
+      /* Accent Colors for JOINs */
+      --color-inner: #10b981; /* Emerald */
+      --color-left: #0ea5e9;  /* Sky Blue */
+      --color-right: #8b5cf6; /* Violet */
+      --color-full: #f59e0b;  /* Amber */
+      --color-cross: #ec4899; /* Pink */
+      --color-self: #14b8a6;  /* Teal */
+      --color-natural: #3b82f6; /* Blue */
+      
+      --sidebar-width: 280px;
+      --header-height: 70px;
+      --transition-speed: 0.25s;
+    }
+
+    /* Light Theme (For Print and Optional Toggle) */
+    .light-theme {
+      --bg-color: #f8f9fa;
+      --card-bg: rgba(255, 255, 255, 0.85);
+      --card-bg-solid: #ffffff;
+      --border-color: rgba(200, 200, 200, 0.5);
+      --border-color-active: rgba(0, 0, 0, 0.15);
+      --text-color: #1a1a1a;
+      --text-muted: #4a5568;
+      --text-dark: #718096;
+      
+      --color-inner: #059669;
+      --color-left: #0284c7;
+      --color-right: #7c3aed;
+      --color-full: #d97706;
+      --color-cross: #db2777;
+      --color-self: #0d9488;
+      --color-natural: #2563eb;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+    }
+
+    body {
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: background-color var(--transition-speed), color var(--transition-speed);
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-color);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-dark);
+    }
+
+    /* -------------------------------------------------------------
+       Layout Structure
+       ------------------------------------------------------------- */
+    #app-container {
+      display: flex;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* Sidebar - Left Sticky Panel */
+    #sidebar {
+      width: var(--sidebar-width);
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      background: rgba(9, 9, 11, 0.95);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      padding: 24px;
+      z-index: 100;
+      overflow-y: auto;
+      transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 30px;
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: -0.5px;
+    }
+
+    .sidebar-brand svg {
+      width: 24px;
+      height: 24px;
+      fill: var(--color-left);
+    }
+
+    .sidebar-menu {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .sidebar-menu li a {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 6px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.15s ease;
+      border-left: 2px solid transparent;
+    }
+
+    .sidebar-menu li a:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-color);
+    }
+
+    .sidebar-menu li.active a {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-color);
+      border-left-color: var(--color-left);
+      font-weight: 600;
+    }
+
+    /* Main Content Wrapper */
+    #main-wrapper {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      display: flex;
+      flex-direction: column;
+      min-width: 0; /* Prevents flex children from breaking layouts */
+    }
+
+    /* Top Navigation Header */
+    #top-header {
+      height: var(--header-height);
+      position: sticky;
+      top: 0;
+      background: rgba(9, 9, 11, 0.8);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      z-index: 90;
+      transition: background-color var(--transition-speed);
+    }
+
+    .search-container {
+      position: relative;
+      width: 400px;
+    }
+
+    .search-input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 16px 10px 40px;
+      color: var(--text-color);
+      font-size: 14px;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--color-left);
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
+    }
+
+    .search-container svg {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      fill: var(--text-muted);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 8px 16px;
+      color: var(--text-color);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--text-muted);
+    }
+
+    .btn-primary {
+      background: var(--color-left);
+      border-color: var(--color-left);
+      color: #09090b;
+    }
+
+    .btn-primary:hover {
+      background: #38bdf8;
+      border-color: #38bdf8;
+      color: #09090b;
+    }
+
+    .keyboard-shortcut-hint {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-color);
+      margin-left: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Main Scroll Area */
+    #main-content {
+      padding: 40px;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 60px;
+    }
+
+    /* Collapsible Section Layout */
+    .section-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .section-card:hover {
+      border-color: var(--border-color-active);
+      box-shadow: 0 10px 30px -15px rgba(0, 0, 0, 0.5);
+    }
+
+    .section-header {
+      padding: 24px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.25s ease;
+    }
+
+    .section-card.expanded .section-header {
+      border-bottom-color: var(--border-color);
+    }
+
+    .section-title {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .section-number {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-left);
+      background: rgba(14, 165, 233, 0.1);
+      border: 1px solid rgba(14, 165, 233, 0.2);
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .section-toggle-icon {
+      width: 20px;
+      height: 20px;
+      fill: var(--text-muted);
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .section-card.expanded .section-toggle-icon {
+      transform: rotate(185deg);
+    }
+
+    .section-body {
+      padding: 0 32px;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: padding 0.3s ease, max-height 0.3s ease, opacity 0.3s ease;
+    }
+
+    .section-card.expanded .section-body {
+      padding: 32px;
+      max-height: 12000px; /* Large enough to house large tables */
+      opacity: 1;
+    }
+
+    /* -------------------------------------------------------------
+       Tables, Badges, and Grid Components
+       ------------------------------------------------------------- */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      border: 1px solid transparent;
+    }
+
+    .badge-inner { background: rgba(16, 185, 129, 0.1); color: var(--color-inner); border-color: rgba(16, 185, 129, 0.2); }
+    .badge-left { background: rgba(14, 165, 233, 0.1); color: var(--color-left); border-color: rgba(14, 165, 233, 0.2); }
+    .badge-right { background: rgba(139, 92, 246, 0.1); color: var(--color-right); border-color: rgba(139, 92, 246, 0.2); }
+    .badge-full { background: rgba(245, 158, 11, 0.1); color: var(--color-full); border-color: rgba(245, 158, 11, 0.2); }
+    .badge-cross { background: rgba(236, 72, 153, 0.1); color: var(--color-cross); border-color: rgba(236, 72, 153, 0.2); }
+    .badge-self { background: rgba(20, 184, 166, 0.1); color: var(--color-self); border-color: rgba(20, 184, 166, 0.2); }
+    .badge-natural { background: rgba(59, 130, 246, 0.1); color: var(--color-natural); border-color: rgba(59, 130, 246, 0.2); }
+
+    .responsive-table-container {
+      overflow-x: auto;
+      margin: 20px 0;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+    }
+
+    .custom-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    .custom-table th {
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid var(--border-color);
+      padding: 14px 18px;
+      font-weight: 600;
+      color: var(--text-color);
+    }
+
+    .custom-table td {
+      border-bottom: 1px solid var(--border-color);
+      padding: 14px 18px;
+      color: var(--text-muted);
+      vertical-align: top;
+      line-height: 1.5;
+    }
+
+    .custom-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .custom-table tr:hover td {
+      background: rgba(255, 255, 255, 0.01);
+      color: var(--text-color);
+    }
+
+    /* Highlight matching search text */
+    mark {
+      background: rgba(14, 165, 233, 0.3);
+      color: inherit;
+      padding: 0 2px;
+      border-radius: 2px;
+    }
+
+    /* Code blocks / Syntax Highlighting Styling */
+    pre {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px;
+      overflow-x: auto;
+      margin: 10px 0;
+      position: relative;
+    }
+
+    code {
+      font-family: "Fira Code", "Courier New", Courier, monospace;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    /* SQL Highlighter tokens */
+    .sql-kw { color: #f43f5e; font-weight: 700; }      /* Keywords (Rose) */
+    .sql-str { color: #10b981; }                     /* Strings (Emerald) */
+    .sql-num { color: #f59e0b; }                     /* Numbers (Amber) */
+    .sql-comment { color: var(--text-dark); font-style: italic; } /* Comments */
+    .sql-ident { color: #38bdf8; }                   /* Column/Table identifiers (Sky) */
+
+    .copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 11px;
+      color: var(--text-muted);
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s, background-color 0.15s;
+    }
+
+    pre:hover .copy-btn {
+      opacity: 1;
+    }
+
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: var(--text-color);
+    }
+
+    /* -------------------------------------------------------------
+       Specific Section Designs
+       ------------------------------------------------------------- */
+
+    /* Section 1: Flowchart/Decision Tree */
+    .tree-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      margin: 30px 0;
+    }
+
+    .tree-node {
+      background: var(--card-bg-solid);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px 24px;
+      text-align: center;
+      max-width: 380px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .tree-node:hover {
+      border-color: var(--color-left);
+      box-shadow: 0 0 15px rgba(14, 165, 233, 0.15);
+    }
+
+    .tree-node-title {
+      font-weight: 700;
+      font-size: 16px;
+      margin-bottom: 6px;
+      color: var(--text-color);
+    }
+
+    .tree-node-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .tree-node-expanded-info {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, margin-top 0.3s ease;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    .tree-node.expanded-detail .tree-node-expanded-info {
+      max-height: 250px;
+      margin-top: 15px;
+      border-top: 1px solid var(--border-color);
+      padding-top: 12px;
+    }
+
+    .tree-arrow {
+      width: 2px;
+      height: 30px;
+      background: var(--border-color);
+      position: relative;
+    }
+
+    .tree-arrow::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 6px solid var(--border-color);
+    }
+
+    .tree-branches {
+      display: flex;
+      justify-content: center;
+      gap: 120px;
+      position: relative;
+      width: 100%;
+    }
+
+    .tree-branch-line {
+      position: absolute;
+      top: -24px;
+      left: 25%;
+      right: 25%;
+      height: 2px;
+      background: var(--border-color);
+    }
+
+    /* Section 3: Which Table Should Be Left Diagram */
+    .asymmetry-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-top: 20px;
+    }
+
+    .asymmetry-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    .asymmetry-card-title {
+      font-weight: 700;
+      font-size: 16px;
+      margin-bottom: 16px;
+      color: var(--text-color);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .visual-table-row {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 6px;
+    }
+
+    .visual-cell {
+      flex: 1;
+      padding: 10px;
+      font-size: 12px;
+      border-radius: 4px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .cell-preserved { background: rgba(14, 165, 233, 0.2); border: 1px solid var(--color-left); color: #fff; }
+    .cell-optional { background: rgba(139, 92, 246, 0.1); border: 1px dashed var(--color-right); color: var(--text-muted); }
+    .cell-null { background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.3); color: #f43f5e; }
+
+    /* Section 6: Venn Diagrams */
+    .venn-section-layout {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+      margin: 20px 0;
+    }
+
+    .venn-svg-wrapper {
+      position: relative;
+      width: 320px;
+      height: 220px;
+    }
+
+    .venn-svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .venn-circle {
+      fill-opacity: 0.15;
+      stroke-width: 2;
+      transition: fill-opacity var(--transition-speed), fill var(--transition-speed);
+    }
+
+    .venn-circle.left-circle {
+      fill: var(--color-left);
+      stroke: var(--color-left);
+    }
+
+    .venn-circle.right-circle {
+      fill: var(--color-right);
+      stroke: var(--color-right);
+    }
+
+    /* Hovering effects */
+    .venn-region {
+      cursor: pointer;
+      fill-opacity: 0;
+      transition: fill-opacity var(--transition-speed);
+    }
+
+    .venn-region:hover {
+      fill-opacity: 0.4;
+    }
+
+    .venn-region.active-region {
+      fill-opacity: 0.35;
+    }
+
+    .venn-controls {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .venn-checkbox-btn {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 10px 18px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+      transition: all 0.2s;
+    }
+
+    .venn-checkbox-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--text-dark);
+    }
+
+    .venn-checkbox-btn.active {
+      border-color: var(--color-left);
+      background: rgba(14, 165, 233, 0.1);
+      color: #fff;
+    }
+
+    .venn-checkbox-indicator {
+      width: 14px;
+      height: 14px;
+      border: 1.5px solid var(--text-muted);
+      border-radius: 3px;
+      position: relative;
+    }
+
+    .venn-checkbox-btn.active .venn-checkbox-indicator {
+      border-color: var(--color-left);
+      background: var(--color-left);
+    }
+
+    .venn-checkbox-btn.active .venn-checkbox-indicator::after {
+      content: '';
+      position: absolute;
+      top: 1px;
+      left: 4px;
+      width: 3px;
+      height: 7px;
+      border: solid #09090b;
+      border-width: 0 1.5px 1.5px 0;
+      transform: rotate(45deg);
+    }
+
+    .venn-explanation-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px 20px;
+      width: 100%;
+      max-width: 600px;
+      text-align: center;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* Section 7: ON vs WHERE Side-by-Side Comparison */
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin: 20px 0;
+    }
+
+    .compare-card {
+      background: rgba(255, 255, 255, 0.015);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 20px;
+    }
+
+    .compare-card-title {
+      font-weight: 700;
+      font-size: 15px;
+      margin-bottom: 12px;
+      color: var(--text-color);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Section 9: JOIN Cheat Matrix */
+    .matrix-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .matrix-header-cell {
+      padding: 14px 10px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--text-color);
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+    }
+
+    .matrix-cell {
+      padding: 18px 10px;
+      text-align: center;
+      font-size: 13px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.01);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .matrix-cell.highlight-inner { border-color: var(--color-inner); background: rgba(16, 185, 129, 0.05); color: var(--color-inner); font-weight: 700; }
+    .matrix-cell.highlight-left { border-color: var(--color-left); background: rgba(14, 165, 233, 0.05); color: var(--color-left); font-weight: 700; }
+    .matrix-cell.highlight-right { border-color: var(--color-right); background: rgba(139, 92, 246, 0.05); color: var(--color-right); font-weight: 700; }
+    .matrix-cell.highlight-full { border-color: var(--color-full); background: rgba(245, 158, 11, 0.05); color: var(--color-full); font-weight: 700; }
+
+    /* Section 11: Complete JOIN Examples Dataset Layout */
+    .dataset-tab-wrapper {
+      margin-bottom: 24px;
+    }
+
+    .tab-btn-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-color);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .tab-btn.active {
+      color: var(--color-left);
+      background: rgba(14, 165, 233, 0.08);
+      border-color: rgba(14, 165, 233, 0.2);
+    }
+
+    .dataset-content {
+      display: none;
+    }
+
+    .dataset-content.active-dataset {
+      display: block;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    .schema-tables-row {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+
+    .schema-table-card {
+      flex: 1;
+      min-width: 250px;
+      background: rgba(255, 255, 255, 0.015);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 14px;
+    }
+
+    .schema-table-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-color);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 6px;
+    }
+
+    /* Section 14: Practice Flashcard Grid */
+    .practice-controls-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .practice-search-container {
+      width: 280px;
+      position: relative;
+    }
+
+    .practice-search-input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 8px 12px 8px 34px;
+      color: var(--text-color);
+      font-size: 13px;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .practice-search-input:focus {
+      border-color: var(--color-left);
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .practice-search-container svg {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+      fill: var(--text-muted);
+    }
+
+    .practice-filter-group {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .practice-filter-btn {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .practice-filter-btn:hover {
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-color);
+    }
+
+    .practice-filter-btn.active {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--text-muted);
+      color: var(--text-color);
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .practice-card {
+      background: rgba(255, 255, 255, 0.015);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .practice-card:hover {
+      border-color: var(--border-color-active);
+    }
+
+    .practice-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+
+    .practice-card-question {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-color);
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    .practice-reveal-section {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.3s ease, opacity 0.3s ease, margin-top 0.3s ease;
+    }
+
+    .practice-card.revealed .practice-reveal-section {
+      max-height: 1000px;
+      opacity: 1;
+      margin-top: 20px;
+      border-top: 1px solid var(--border-color);
+      padding-top: 20px;
+    }
+
+    .practice-reveal-btn {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-color);
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .practice-reveal-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--text-dark);
+    }
+
+    .practice-card.revealed .practice-reveal-btn {
+      display: none;
+    }
+
+    .practice-pagination-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 30px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .practice-page-info {
+      font-weight: 500;
+    }
+
+    .practice-pagination-btns {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* Section 13: Memory Trick Rules Layout */
+    .memory-tricks-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin: 20px 0;
+    }
+
+    .trick-card {
+      background: rgba(255, 255, 255, 0.015);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      gap: 20px;
+    }
+
+    .trick-icon-wrapper {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .trick-icon-wrapper svg {
+      width: 24px;
+      height: 24px;
+      fill: var(--color-left);
+    }
+
+    .trick-details h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text-color);
+    }
+
+    .trick-details p {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Keyboard Shortcuts Modal overlay (Optional Toggle) */
+    .shortcuts-help-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(8px);
+    }
+
+    .shortcuts-help-modal {
+      background: var(--card-bg-solid);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      max-width: 500px;
+      width: 90%;
+      padding: 32px;
+    }
+
+    .shortcuts-modal-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+    }
+
+    .shortcut-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .shortcut-keys {
+      display: flex;
+      gap: 4px;
+    }
+
+    .shortcut-key {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.5);
+    }
+
+    /* -------------------------------------------------------------
+       Responsive Design Layout
+       ------------------------------------------------------------- */
+    @media (max-width: 1024px) {
+      #sidebar {
+        transform: translateX(-100%);
+      }
+      
+      #sidebar.show-mobile-sidebar {
+        transform: translateX(0);
+      }
+      
+      #main-wrapper {
+        margin-left: 0;
+      }
+      
+      #top-header {
+        padding: 0 20px;
+      }
+
+      .mobile-menu-toggle {
+        display: block !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .compare-grid, .asymmetry-grid, .matrix-grid, .memory-tricks-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .matrix-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      #top-header {
+        flex-direction: column;
+        height: auto;
+        padding: 15px 20px;
+        gap: 15px;
+        align-items: stretch;
+      }
+
+      .search-container {
+        width: 100%;
+      }
+    }
+
+    .mobile-menu-toggle {
+      display: none;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      fill: var(--text-color);
+      width: 24px;
+      height: 24px;
+    }
+
+    /* Fade in animation helper */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* -------------------------------------------------------------
+       Print Styles Optimization
+       ------------------------------------------------------------- */
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-size: 12px;
+      }
+
+      #sidebar, #top-header, .header-actions, .copy-btn, .practice-controls-row, .practice-pagination-container, .mobile-menu-toggle, .section-toggle-icon {
+        display: none !important;
+      }
+
+      #main-wrapper {
+        margin-left: 0 !important;
+      }
+
+      #main-content {
+        padding: 0 !important;
+        gap: 30px !important;
+      }
+
+      .section-card {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        page-break-after: always;
+        overflow: visible !important;
+      }
+
+      .section-body {
+        max-height: none !important;
+        opacity: 1 !important;
+        padding: 20px 0 !important;
+      }
+
+      .custom-table th {
+        background: #f1f2f5 !important;
+        color: #000000 !important;
+        border-bottom: 2px solid #ccc !important;
+      }
+
+      .custom-table td {
+        color: #333 !important;
+        border-bottom: 1px solid #ddd !important;
+      }
+
+      /* Auto reveal practice cards on print */
+      .practice-reveal-section {
+        max-height: none !important;
+        opacity: 1 !important;
+        margin-top: 10px !important;
+        border-top: 1px solid #ccc !important;
+        padding-top: 10px !important;
+      }
+
+      .practice-reveal-btn {
+        display: none !important;
+      }
+
+      pre {
+        background: #f5f6f8 !important;
+        border: 1px solid #ddd !important;
+        color: #000 !important;
+        page-break-inside: avoid;
+      }
+      
+      .sql-kw { color: #85144b !important; }
+      .sql-str { color: #2ecc40 !important; }
+      .sql-num { color: #ff851b !important; }
+      .sql-comment { color: #aaa !important; }
+      
+      .tree-node {
+        border-color: #333 !important;
+        background: #fafafa !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app-container">
+    
+    <!-- -------------------------------------------------------------
+         Sidebar Navigation Menu
+         ------------------------------------------------------------- -->
+    <aside id="sidebar">
+      <div class="sidebar-brand">
+        <svg viewBox="0 0 24 24">
+          <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A2,2 0 0,1 14,6A2,2 0 0,1 12,8A2,2 0 0,1 10,6A2,2 0 0,1 12,4M12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18Z"/>
+        </svg>
+        <span>SQL JOIN Cheat Sheet</span>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="active"><a href="#section-decision-tree">1. JOIN Decision Tree</a></li>
+        <li><a href="#section-translator">2. NL to JOIN Translator</a></li>
+        <li><a href="#section-which-left">3. Which Table on Left?</a></li>
+        <li><a href="#section-left-vs-inner">4. LEFT vs INNER JOIN</a></li>
+        <li><a href="#section-left-vs-right">5. LEFT vs RIGHT JOIN</a></li>
+        <li><a href="#section-full-outer">6. FULL OUTER JOIN</a></li>
+        <li><a href="#section-on-vs-where">7. ON vs WHERE clauses</a></li>
+        <li><a href="#section-pattern-recognition">8. Pattern Recognition</a></li>
+        <li><a href="#section-cheat-matrix">9. JOIN Cheat Matrix</a></li>
+        <li><a href="#section-templates">10. SQL Syntax Templates</a></li>
+        <li><a href="#section-complete-examples">11. Complete JOIN Examples</a></li>
+        <li><a href="#section-common-mistakes">12. Common Mistakes (30)</a></li>
+        <li><a href="#section-memory-tricks">13. Memory Tricks</a></li>
+        <li><a href="#section-practice-challenge">14. Practice Challenge (100)</a></li>
+      </ul>
+    </aside>
+
+    <!-- -------------------------------------------------------------
+         Main wrapper area (Header + Content)
+         ------------------------------------------------------------- -->
+    <div id="main-wrapper">
+      
+      <header id="top-header">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <button class="mobile-menu-toggle" id="mobile-sidebar-toggle" title="Toggle Sidebar">
+            <svg viewBox="0 0 24 24" width="24" height="24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+          </button>
+          <div class="search-container">
+            <svg viewBox="0 0 24 24"><path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"/></svg>
+            <input type="text" class="search-input" id="global-search" placeholder="Type to search (e.g. employee, NULL, WHERE)..." autocomplete="off">
+            <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 11px; color: var(--text-dark); pointer-events: none;">
+              Search <span class="keyboard-shortcut-hint">/</span>
+            </span>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="btn" id="btn-toggle-theme" title="Toggle Light/Dark Theme">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12,18C11.11,18 10.26,17.8 9.5,17.45C11.56,16.5 13,14.42 13,12C13,9.58 11.56,7.5 9.5,6.55C10.26,6.2 11.11,6 12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18M20,8.69V4H15.31L12,0.69L8.69,4H4V8.69L0.69,12L4,15.31V20H8.69L12,23.31L15.31,20H20V15.31L23.31,12L20,8.69Z"/></svg>
+            Theme
+          </button>
+          <button class="btn" id="btn-shortcuts" title="Keyboard Shortcuts">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M20,18H4V6H20M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4M11,8H13V10H11M11,14H13V16H11M8,8H10V10H8M8,14H10V16H8M5,8H7V10H5M5,14H7V16H5M14,8H16V10H14M14,14H16V16H14M17,8H19V10H17M17,14H19V16H17M9,11H15V13H9"/></svg>
+            Keys <span class="keyboard-shortcut-hint">?</span>
+          </button>
+          <button class="btn btn-primary" id="btn-print" title="Export as PDF / Print Cheat Sheet">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M18,3H6V7H18M19,12A1,1 0 0,1 18,11A1,1 0 0,1 17,10A1,1 0 0,1 18,9A1,1 0 0,1 19,10M16,19H8V14H16M19,8H5A3,3 0 0,0 2,11V17H6V21H18V17H22V11A3,3 0 0,0 19,8Z"/></svg>
+            Print PDF
+          </button>
+        </div>
+      </header>
+
+      <main id="main-content">
+        
+        <!-- -------------------------------------------------------------
+             SECTION 1: SQL JOIN Decision Tree
+             ------------------------------------------------------------- -->
+        <section id="section-decision-tree" class="section-card expanded">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="section-number">01</span>
+              <span>SQL JOIN Decision Tree</span>
+            </div>
+            <svg class="section-toggle-icon" viewBox="0 0 24 24"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/></svg>
+          </div>
+          <div class="section-body">
+            <p style="color: var(--text-muted); margin-bottom: 20px; line-height: 1.6;">
+              Click on any decision node below to expand the technical explanation and view syntax templates instantly.
+            </p>
+            <div class="tree-container">
+              <div class="tree-node" onclick="toggleTreeNode(this)">
+                <div class="tree-node-title">Read the Question carefully</div>
+                <div class="tree-node-desc">Analyze the requirements & schema. Start here.</div>
+              </div>
+              
+              <div class="tree-arrow"></div>
+              
+              <div class="tree-node" onclick="toggleTreeNode(this)">
+                <div class="tree-node-title">Do you need only matching rows?</div>
+                <div class="tree-node-desc">Are unmatched records completely filtered out?</div>
+                <div class="tree-node-expanded-info">
+                  <strong>Path A: Yes</strong><br>
+                  If you only need rows where keys exist in both tables (intersection), use an <strong>INNER JOIN</strong>.<br><br>
+                  <code>SELECT * FROM A INNER JOIN B ON A.key = B.key;</code>
+                </div>
+              </div>
+
+              <div class="tree-arrow"></div>
+
+              <div class="tree-node" onclick="toggleTreeNode(this)">
+                <div class="tree-node-title">Do you need all rows from the Left table?</div>
+                <div class="tree-node-desc">Keep table A intact while right table B is optional?</div>
+                <div class="tree-node-expanded-info">
+                  <strong>Path B: Yes</strong><br>
+                  Use a <strong>LEFT JOIN</strong>. This preserves the left table and pads unmatched right rows with NULLs.<br><br>
+                  <code>SELECT * FROM A LEFT JOIN B ON A.key = B.key;</code>
+                </div>
+              </div>
+
+              <div class="tree-arrow"></div>
+
+              <div class="tree-node" onclick="toggleTreeNode(this)">
+                <div class="tree-node-title">Do you need all rows from the Right table?</div>
+                <div class="tree-node-desc">Keep B intact while left table A is optional?</div>
+                <div class="tree-node-expanded-info">
+                  <strong>Path C: Yes</strong><br>
+                  Use a <strong>RIGHT JOIN</strong>. Alternatively, swap table order and use a LEFT JOIN (preferred for style).<br><br>
+                  <code>SELECT * FROM A RIGHT JOIN B ON A.key = B.key;</code>
+                </div>
+              </div>
+
+              <div class="tree-arrow"></div>
+
+              <div class="tree-node" onclick="toggleTreeNode(this)">
+                <div class="tree-node-title">Do you need every row from both tables?</div>
+                <div class="tree-node-desc">Union of both left and right unmatched rows?</div>
+                <div class="tree-node-expanded-info">
+                  <strong>Path D: Yes</strong><br>
+                  Use a <strong>FULL OUTER JOIN</strong>. Matches where possible, otherwise pads missing fields with NULLs.<br><br>
+                  <code>SELECT * FROM A FULL OUTER JOIN B ON A.key = B.key;</code>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- -------------------------------------------------------------
+             SECTION 2: Natural Language to JOIN Translator
+             ------------------------------------------------------------- -->
+        <section id="section-translator" class="section-card expanded">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="section-number">02</span>
+              <span>Natural Language → JOIN Translator</span>
+            </div>
+            <svg class="section-toggle-icon" viewBox="0 0 24 24"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/></svg>
+          </div>
+          <div class="section-body">
+            <p style="color: var(--text-muted); margin-bottom: 16px; line-height: 1.6;">
+              Translates 100 common phrasing combinations found in technical tests, interview prompts, and exams.
+            </p>
+            <div class="responsive-table-container">
+              <table class="custom-table" id="table-translator">
+                <thead>
+                  <tr>
+                    <th>Question Wording</th>
+                    <th>Logical SQL Meaning</th>
+                    <th>Recommended JOIN</th>
+                  </tr>
+                </thead>
+                <tbody id="body-translator">
+                  <!-- JS Inject -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- -------------------------------------------------------------
+             SECTION 3: Which Table Should Be Left?
+             ------------------------------------------------------------- -->
+        <section id="section-which-left" class="section-card expanded">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="section-number">03</span>
+              <span>Which Table Should Be Left?</span>
+            </div>
+            <svg class="section-toggle-icon" viewBox="0 0 24 24"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/></svg>
+          </div>
+          <div class="section-body">
+            <p style="color: var(--text-muted); margin-bottom: 24px; line-height: 1.6;">
+              Outer Joins are <strong>asymmetric</strong>. The order of tables dictates which table is fully preserved. Let's compare left-side positioning visually.
+            </p>
+            <div class="asymmetry-grid">
+              
+              <div class="asymmetry-card">
+                <div class="asymmetry-card-title">
+                  <span class="badge badge-left">Employee</span>
+                  <span>LEFT JOIN</span>
+                  <span class="badge badge-right">Department</span>
+                </div>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+                  <strong>Meaning:</strong> Keep every single employee row in the output database, even if their assigned department ID is invalid or NULL.
+                </p>
+                <div class="visual-table-row">
+                  <div class="visual-cell cell-preserved">Emp #101</div>
+                  <div class="visual-cell cell-preserved">Dept #1 (Sales)</div>
+                </div>
+                <div class="visual-table-row">
+                  <div class="visual-cell cell-preserved">Emp #102</div>
+                  <div class="visual-cell cell-preserved">Dept #2 (HR)</div>
+                </div>
+                <div class="visual-table-row">
+                  <div class="visual-cell cell-preserved">Emp #103 (No Dept)</div>
+                  <div class="visual-cell cell-null">NULL</div>
+                </div>
+              </div>
+
+              <div class="asymmetry-card">
+                <div class="asymmetry-card-title">
+                  <span class="badge badge-right">Department</span>
+                  <span>LEFT JOIN</span>
+                  <span class="badge badge-left">Employee</span>
+                </div>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+                  <strong>Meaning:</strong> Keep every department row in the output database, even if the department has no active employees assigned to it.
+                </p>
+                <div class="visual-table-row">
+                  <div class="visual-cell cell-preserved">Dept #1 (Sales)</div>
+                  <div class="visual-cell cell-preserved">Emp #101</div>
+                </div>
+                <div class="visual-table-row">
+                  <div class="visual-cell cell-preserved">Dept #2 (HR)</div>
+                  <div class="visual-cell cell-preserved">Emp #102</div>
+                </div>
+                <div class="visual-table-row">
+                  <div class="visual-cell cell-preserved">Dept #3 (Marketing)</div>
+                  <div class="visual-cell cell-null">NULL</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <!-- -------------------------------------------------------------
+             SECTION 4: LEFT JOIN vs INNER JOIN Comparison
+             ------------------------------------------------------------- -->
+        <section id="section-left-vs-inner" class="section-card expanded">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="section-number">04</span>
+              <span>LEFT JOIN vs INNER JOIN</span>
+            </div>
+            <svg class="section-toggle-icon" viewBox="0 0 24 24"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/></svg>
+          </div>
+          <div class="section-body">
+            <div class="responsive-table-container">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Metric</th>
+                    <th>INNER JOIN</th>
+                    <th>LEFT OUTER JOIN</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Core Objective</strong></td>
+                    <td>Return only rows that match the join condition in BOTH tables.</td>
+                    <td>Return ALL rows from the left table, plus matching rows from the right.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Output Difference</strong></td>
+                    <td>Rows without matches in either table are completely filtered out.</td>
+                    <td>Left table rows are always kept. Unmatched right side is filled with NULLs.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>NULL Handling</strong></td>
+                    <td>Omit NULL key comparisons (they do not match).</td>
+                    <td>Includes records with NULL keys on the left table.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Typical Traps</strong></td>
+                    <td>Accidentally dropping critical records (e.g. users without orders).</td>
+                    <td>Assuming left joins are always faster. Turning it into an inner join in the WHERE clause.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- -------------------------------------------------------------
+             SECTION 5: LEFT JOIN vs RIGHT JOIN Equivalence
+             ------------------------------------------------------------- -->
+        <section id="section-left-vs-right" class="section-card expanded">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="section-number">05</span>
+              <span>LEFT JOIN vs RIGHT JOIN</span>
+            </div>
+            <svg class="section-toggle-icon" viewBox="0 0 24 24"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/></svg>
+          </div>
+          <div class="section-body">
+            <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 20px;">
+              A <strong>RIGHT JOIN</strong> is logically equivalent to a <strong>LEFT JOIN</strong> with the tables swapped.
+            </p>
+            <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 20px;">
+              <code style="font-size: 16px; font-weight: 700; color: #fff;">
+                TableA <span style="color: var(--color-right);">RIGHT JOIN</span> TableB ON TableA.id = TableB.id<br>
+                ≡<br>
+                TableB <span style="color: var(--color-left);">LEFT JOIN</span> TableA ON TableB.id = TableA.id
+              </code>
+            </div>
+            <p style="color: var(--text-muted); line-height: 1.6;">
+              <strong>Style Preference:</strong> In professional environments, developers almost universally prefer <code>LEFT JOIN</code> over <code>RIGHT JOIN</code> because SQL reads left-to-right. Placing the primary table on the left aligns the query with natural reading order.
+            </p>
+          </div>
+        </section>
+
+        <!-- -------------------------------------------------------------
+             SECTION 6: FULL OUTER JOIN Interactivity
+             ------------------------------------------------------------- -->
+        <section id="section-full-outer" class="section-card expanded">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="section-number">06</span>
+              <span>FULL OUTER JOIN</span>
+            </div>
+            <svg class="section-toggle-icon" viewBox="0 0 24 24"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/></svg>
+          </div>
+          <div class="section-body">
+            <p style="color: var(--text-muted); margin-bottom: 24px; line-height: 1.6;">
+              Select regions on the Venn diagram or click buttons to visualize query outputs in a FULL OUTER JOIN context.
+            </p>
+            <div class="venn-section-layout">
+              <div class="venn-svg-wrapper">
+                <svg class="venn-svg" viewBox="0 0 300 200">
+                  <!-- Left circle (A) -->
+                  <circle cx="110" cy="100" r="70" class="venn-circle left-circle" />
+                  <!-- Right circle (B) -->
+                  <circle cx="190" cy="100" r="70" class="venn-circle right-circle" />
+                  
+                  <!-- Clickable regions -->
+                  <!-- Left Only: A - B -->
+                  <path d="M110,30 A70,70 0 0,0 148.8,158 A70,70 0 0,1 148.8,42 A70,70 0 0,0 110,30 Z" 
+                        fill="var(--color-left)" class="venn-region" id="region-left" onclick="selectVennRegion('left')"/>
+                  <!-- Overlap: A & B -->
+                  <path d="M148.8,42 A70,70 0 0,1 190,100 A70,70 0 0,1 148.8,158 A70,70 0 0,1 110,100 A70,70 0 0,1 148.8,42 Z" 
+                        fill="var(--color-inner)" class="venn-region" id="region-matching" onclick="selectVennRegion('matching')"/>
+                  <!-- Right Only: B - A -->
+                  <path d="M190,30 A70,70 0 0,1 228.8,100 A70,70 0 0,1 190,170 A70,70 0 0,0 151.2,158 A70,70 0 0,1 151.2,42 A70,70 0 0,0 190,30 Z" 
+                        fill="var(--color-right)" class="venn-region" id="region-right" onclick="selectVennRegion('right')"/>
+                </svg>
+              </div>
+
+              <div class="venn-controls">
+                <button class="venn-checkbox-btn" id="btn-venn-left" onclick="toggleVennToggle('left')">
+                  <div class="venn-checkbox-indicator"></div>
+                  <span>Left Only (A - B)</span>
+                </button>
+                <button class="venn-checkbox-btn" id="btn-venn-matching" onclick="toggleVennToggle('matching')">
+                  <div class="venn-checkbox-indicator"></div>
+                  <span>Matching (A ∩ B)</span>
+                </button>
+                <button class="venn-checkbox-btn" id="btn-venn-right" onclick="toggleVennToggle('right')">
+                  <div class="venn-checkbox-indicator"></div>
+                  <span>Right Only (B - A)</span>
+                </button>
+              </div>
+
+              <div class="venn-explanation-card" id="venn-explanation">
+                Click on Venn circles or checkboxes above to check row extraction logic.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- -------------------------------------------------------------
+             SECTION 7: ON vs WHERE Clauses
+             ------------------------------------------------------------- -->
+        <section id="section-on-vs-where" class="section-card expanded">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="section-number">07</span>
+              <span>ON vs WHERE Filter Placement</span>
+            </div>
+            <svg class="section-toggle-icon" viewBox="0 0 24 24"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/></svg>
+          </div>
+          <div class="section-body">
+            <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 20px;">
+              Placing a query filter in the <code>ON</code> clause vs the <code>WHERE</code> clause behaves identically for <code>INNER JOIN</code>, but causes drastically different outcomes for outer joins (<code>LEFT</code>, <code>RIGHT</code>, <code>FULL</code>).
+            </p>
+            
+            <div class="compare-grid">
+              <div class="compare-card">
+                <div class="compare-card-title">
+                  <span class="badge badge-inner">Condition in ON (LEFT JOIN)</span>
+                </div>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">
+                  Filters the right table <strong>before/during</strong> the join phase. The output keeps all left rows intact, setting right columns to NULL if unmatched.
+                </p>
+                <pre><code class="lang-sql">SELECT e.name, d.name
+FROM employees e
+LEFT JOIN departments d ON e.department_id = d.id
+  AND d.status = 'Active'; -- Keeps all employees!</code></pre>
+              </div>
+
+              <div class="compare-card">
+                <div class="compare-card-title">
+                  <span class="badge badge-left">Condition in WHERE (LEFT JOIN)</span>
+                </div>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">
+                  Filters the result set <strong>after</strong> the join phase. Rows where department details are NULL are dropped because <code>NULL = 'Active'</code> is UNKNOWN.
+                </p>
+                <pre><code class="lang-sql">SELECT e.name, d.name
+FROM employees e
+LEFT JOIN departments d ON e.department_id = d.id
+WHERE d.status = 'Active'; -- Converts to INNER JOIN!</code></pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- -------------------------------------------------------------
+             SECTION 8: Interview Pattern Recognition
+             ------------------------------------------------------------- -->
+        <section id="section-pattern-recognition" class="section-card expanded">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="section-number">08</span>
+              <span>Interview Pattern Recognition</span>
+            </div>
+            <svg class="section-toggle-icon" viewBox="0 0 24 24"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/></svg>
+          </div>
+          <div class="section-body">
+            <p style="color: var(--text-muted); margin-bottom: 16px; line-height: 1.6;">
+              A lookup catalog of 50 phrases linking what the interviewer says to structural requirements.
+            </p>
+            <div class="responsive-table-container">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Question Says...</th>
+                    <th>You Should Think...</th>
+                    <th>Target JOIN type</th>
+                  </tr>
+                </thead>
+                <tbody id="body-patterns">
+                  <!-- JS Inject -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- -------------------------------------------------------------
+             SECTION 9: JOIN Cheat Matrix
+             ------------------------------------------------------------- -->
+        <section id="section-cheat-matrix" class="section-card expanded">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="section-number">09</span>
+              <span>JOIN Cheat Matrix</span>
+            </div>
+            <svg class="section-toggle-icon" viewBox="0 0 24 24"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/></svg>
+          </div>
+          <div class="section-body">
+            <div class="matrix-grid">
+              <div class="matrix-header-cell">Requirement</div>
+              <div class="matrix-header-cell">Matching Only</div>
+              <div class="matrix-header-cell">Keep Left Side</div>
+              <div class="matrix-header-cell">Keep Right Side</div>
+              <div class="matrix-header-cell">Keep Both Sides</div>
+              
+              <div class="matrix-cell" style="font-weight: 700;">SQL JOIN</div>
+              <div class="matrix-cell highlight-inner">INNER JOIN</div>
+              <div class="matrix-cell highlight-left">LEFT JOIN</div>
+              <div class="matrix-cell highlight-right">RIGHT JOIN</div>
+              <div class="matrix-cell highlight-full">FULL JOIN</div>
+
+              <div class="matrix-cell" style="font-weight: 700;">Unmatched rows</div>
+              <div class="matrix-cell">Discarded</div>
+              <div class="matrix-cell">Left kept + NULLs</div>
+              <div class="matrix-cell">Right kept + NULLs</div>
+              <div class="matrix-cell">Both kept + NULLs</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- -------------------------------------------------------------
+             SECTION 10: SQL Syntax Templates
+             ------------------------------------------------------------- -->
+        <section id="section-templates" class="section-card expanded">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="section-number">10</span>
+              <span>SQL Syntax Templates</span>
+            </div>
+            <svg class="section-toggle-icon" viewBox="0 0 24 24"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/></svg>
+          </div>
+          <div class="section-body">
+            <p style="color: var(--text-muted); margin-bottom: 20px; line-height: 1.6;">
+              Review production-ready syntax templates for all mainstream database configurations.
+            </p>
+            <div class="compare-grid">
+              <div class="compare-card">
+                <div class="compare-card-title">INNER JOIN</div>
+                <pre><code class="lang-sql">SELECT a.col, b.col
+FROM table_a a
+INNER JOIN table_b b ON a.key = b.key;</code></pre>
+              </div>
+              <div class="compare-card">
+                <div class="compare-card-title">LEFT JOIN</div>
+                <pre><code class="lang-sql">SELECT a.col, b.col
+FROM table_a a
+LEFT JOIN table_b b ON a.key = b.key;</code></pre>
+              </div>
+              <div class="compare-card">
+                <div class="compare-card-title">RIGHT JOIN</div>
+                <pre><code class="lang-sql">SELECT a.col, b.col
+FROM table_a a
+RIGHT JOIN table_b b ON a.key = b.key;</code></pre>
+              </div>
+              <div class="compare-card">
+                <div class="compare-card-title">FULL OUTER JOIN</div>
+                <pre><code class="lang-sql">SELECT a.col, b.col
+FROM table_a a
+FULL OUTER JOIN table_b b ON a.key = b.key;</code></pre>
+              </div>
+              <div class="compare-card">
+                <div class="compare-card-title">CROSS JOIN</div>
+                <pre><code class="lang-sql">SELECT a.col, b.col
+FROM table_a a
+CROSS JOIN table_b b;</code></pre>
+              </div>
+              <div class="compare-card">
+                <div class="compare-card-title">SELF JOIN</div>
+                <pre><code class="lang-sql">SELECT e.name, m.name AS manager
+FROM employees e
+LEFT JOIN employees m ON e.manager_id = m.id;</code></pre>
+              </div>
+              <div class="compare-card">
+                <div class="compare-card-title">USING() Clause</div>
+                <pre><code class="lang-sql">SELECT *
+FROM employees
+INNER JOIN departments USING(department_id);</code></pre>
+              </div>
+              <div class="compare-card">
+                <div class="compare-card-title">NATURAL JOIN</div>
+                <pre><code class="lang-sql">SELECT *
+FROM employees
+NATURAL JOIN departments;</code></pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- -------------------------------------------------------------
+             SECTION 11: Complete JOIN Examples
+             ------------------------------------------------------------- -->
+        <section id="section-complete-examples" class="section-card expanded">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="section-number">11</span>
+              <span>Complete JOIN Examples</span>
+            </div>
+            <svg class="section-toggle-icon" viewBox="0 0 24 24"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/></svg>
+          </div>
+          <div class="section-body">
+            <div class="dataset-tab-wrapper">
+              <div class="tab-btn-row">
+                <button class="tab-btn active" onclick="switchDataset(this, 'dataset-employees')">Employees & Depts</button>
+                <button class="tab-btn" onclick="switchDataset(this, 'dataset-customers')">Customers & Orders</button>
+                <button class="tab-btn" onclick="switchDataset(this, 'dataset-students')">Students & Courses</button>
+              </div>
+
+              <!-- Employees & Depts -->
+              <div class="dataset-content active-dataset" id="dataset-employees">
+                <div class="schema-tables-row">
+                  <div class="schema-table-card">
+                    <div class="schema-table-title">employees</div>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
+                      <tr><th style="padding: 4px;">id</th><th style="padding: 4px;">name</th><th style="padding: 4px;">dept_id</th></tr>
+                      <tr><td style="padding: 4px;">1</td><td style="padding: 4px;">Alice</td><td style="padding: 4px;">10</td></tr>
+                      <tr><td style="padding: 4px;">2</td><td style="padding: 4px;">Bob</td><td style="padding: 4px;">20</td></tr>
+                      <tr><td style="padding: 4px;">3</td><td style="padding: 4px;">Charlie</td><td style="padding: 4px;">NULL</td></tr>
+                    </table>
+                  </div>
+                  <div class="schema-table-card">
+                    <div class="schema-table-title">departments</div>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
+                      <tr><th style="padding: 4px;">id</th><th style="padding: 4px;">name</th></tr>
+                      <tr><td style="padding: 4px;">10</td><td style="padding: 4px;">Engineering</td></tr>
+                      <tr><td style="padding: 4px;">30</td><td style="padding: 4px;">Marketing</td></tr>
+                    </table>
+                  </div>
+                </div>
+                
+                <div class="compare-grid">
+                  <div class="compare-card">
+                    <div class="compare-card-title">INNER JOIN Example</div>
+                    <pre><code class="lang-sql">SELECT e.name, d.name AS dept
+FROM employees e
+INNER JOIN departments d ON e.dept_id = d.id;</code></pre>
+                    <table style="width:100%; font-size:12px; text-align:left; margin-top:10px;">
+                      <tr><th>name</th><th>dept</th></tr>
+                      <tr><td>Alice</td><td>Engineering</td></tr>
+                    </table>
+                  </div>
+                  
+                  <div class="compare-card">
+                    <div class="compare-card-title">LEFT JOIN Example</div>
+                    <pre><code class="lang-sql">SELECT e.name, d.name AS dept
+FROM employees e
+LEFT JOIN departments d ON e.dept_id = d.id;</code></pre>
+                    <table style="width:100%; font-size:12px; text-align:left; margin-top:10px;">
+                      <tr><th>name</th><th>dept</th></tr>
+                      <tr><td>Alice</td><td>Engineering</td></tr>
+                      <tr><td>Bob</td><td>NULL</td></tr>
+                      <tr><td>Charlie</td><td>NULL</td></tr>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Customers & Orders -->
+              <div class="dataset-content" id="dataset-customers">
+                <div class="schema-tables-row">
+                  <div class="schema-table-card">
+                    <div class="schema-table-title">customers</div>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
+                      <tr><th style="padding: 4px;">id</th><th style="padding: 4px;">name</th></tr>
+                      <tr><td style="padding: 4px;">1</td><td style="padding: 4px;">John</td></tr>
+                      <tr><td style="padding: 4px;">2</td><td style="padding: 4px;">Sarah</td></tr>
+                    </table>
+                  </div>
+                  <div class="schema-table-card">
+                    <div class="schema-table-title">orders</div>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
+                      <tr><th style="padding: 4px;">id</th><th style="padding: 4px;">cust_id</th><th style="padding: 4px;">total</th></tr>
+                      <tr><td style="padding: 4px;">101</td><td style="padding: 4px;">1</td><td style="padding: 4px;">$99.00</td></tr>
+                      <tr><td style="padding: 4px;">102</td><td style="padding: 4px;">3</td><td style="padding: 4px;">$49.00</td></tr>
+                    </table>
+                  </div>
+                </div>
+
+                <div class="compare-grid">
+                  <div class="compare-card">
+                    <div class="compare-card-title">FULL OUTER JOIN Example</div>
+                    <pre><code class="lang-sql">SELECT c.name, o.id AS order_id
+FROM customers c
+FULL OUTER JOIN orders o ON c.id = o.cust_id;</code></pre>
+                    <table style="width:100%; font-size:12px; text-align:left; margin-top:10px;">
+                      <tr><th>name</th><th>order_id</th></tr>
+                      <tr><td>John</td><td>101</td></tr>
+                      <tr><td>Sarah</td><td>NULL</td></tr>
+                      <tr><td>NULL</td><td>102</td></tr>
+                    </table>
+                  </div>
+                  
+                  <div class="compare-card">
+                    <div class="compare-card-title">RIGHT OUTER JOIN Example</div>
+                    <pre><code class="lang-sql">SELECT c.name, o.id AS order_id
+FROM customers c
+RIGHT JOIN orders o ON c.id = o.cust_id;</code></pre>
+                    <table style="width:100%; font-size:12px; text-align:left; margin-top:10px;">
+                      <tr><th>name</th><th>order_id</th></tr>
+                      <tr><td>John</td><td>101</td></tr>
+                      <tr><td>NULL</td><td>102</td></tr>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Students & Courses -->
+              <div class="dataset-content" id="dataset-students">
+                <div class="schema-tables-row">
+                  <div class="schema-table-card">
+                    <div class="schema-table-title">students</div>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
+                      <tr><th style="padding: 4px;">id</th><th style="padding: 4px;">name</th></tr>
+                      <tr><td style="padding: 4px;">1</td><td style="padding: 4px;">Max</td></tr>
+                      <tr><td style="padding: 4px;">2</td><td style="padding: 4px;">Emma</td></tr>
+                    </table>
+                  </div>
+                  <div class="schema-table-card">
+                    <div class="schema-table-title">enrollments</div>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
+                      <tr><th style="padding: 4px;">student_id</th><th style="padding: 4px;">course</th></tr>
+                      <tr><td style="padding: 4px;">1</td><td style="padding: 4px;">CS101</td></tr>
+                    </table>
+                  </div>
+                </div>
+
+                <div class="compare-grid">
+                  <div class="compare-card">
+                    <div class="compare-card-title">CROSS JOIN Example</div>
+                    <pre><code class="lang-sql">SELECT s.name, e.course
+FROM students s
+CROSS JOIN enrollments e;</code></pre>
+                    <table style="width:100%; font-size:12px; text-align:left; margin-top:10px;">
+                      <tr><th>name</th><th>course</th></tr>
+                      <tr><td>Max</td><td>CS101</td></tr>
+                      <tr><td>Emma</td><td>CS101</td></tr>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <!-- -------------------------------------------------------------
+             SECTION 12: Common Mistakes (30 Traps)
+             ------------------------------------------------------------- -->
+        <section id="section-common-mistakes" class="section-card expanded">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="section-number">12</span>
+              <span>Common Mistakes (30 Traps)</span>
+            </div>
+            <svg class="section-toggle-icon" viewBox="0 0 24 24"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/></svg>
+          </div>
+          <div class="section-body">
+            <p style="color: var(--text-muted); margin-bottom: 20px; line-height: 1.6;">
+              Avoid these 30 common SQL join mistakes that produce performance degradation or bugs.
+            </p>
+            <div id="container-mistakes" style="display: flex; flex-direction: column; gap: 24px;">
+              <!-- JS Inject -->
+            </div>
+          </div>
+        </section>
+
+        <!-- -------------------------------------------------------------
+             SECTION 13: Memory Tricks
+             ------------------------------------------------------------- -->
+        <section id="section-memory-tricks" class="section-card expanded">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="section-number">13</span>
+              <span>Memory Tricks & Mnemonics</span>
+            </div>
+            <svg class="section-toggle-icon" viewBox="0 0 24 24"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/></svg>
+          </div>
+          <div class="section-body">
+            <div class="memory-tricks-grid">
+              
+              <div class="trick-card">
+                <div class="trick-icon-wrapper">
+                  <svg viewBox="0 0 24 24"><path d="M12 2A10 10 0 1 0 22 12A10 10 0 0 0 12 2M12 12.5A1.5 1.5 0 1 1 13.5 11A1.5 1.5 0 0 1 12 12.5M13 8.5H11V5H13Z"/></svg>
+                </div>
+                <div class="trick-details">
+                  <h3>Need matching only?</h3>
+                  <p>Remember: <strong>INNER = INTERSECTION</strong>. Think of overlapping circles where only rows with coordinates in both sets are preserved.</p>
+                </div>
+              </div>
+
+              <div class="trick-card">
+                <div class="trick-icon-wrapper">
+                  <svg viewBox="0 0 24 24"><path d="M2 12A10 10 0 1 0 12 2A10 10 0 0 0 2 12M13 17H11V15H13V17M13 13H11V7H13V13Z"/></svg>
+                </div>
+                <div class="trick-details">
+                  <h3>Need everyone?</h3>
+                  <p>Remember: <strong>LEFT preserves the LEFT</strong>. If the instruction says "keep all users", place the "users" table first in your query configuration.</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <!-- -------------------------------------------------------------
+             SECTION 14: JOIN Practice Challenge (100 Flashcards)
+             ------------------------------------------------------------- -->
+        <section id="section-practice-challenge" class="section-card expanded">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="section-number">14</span>
+              <span>Practice Challenge (100 cards)</span>
+            </div>
+            <svg class="section-toggle-icon" viewBox="0 0 24 24"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/></svg>
+          </div>
+          <div class="section-body">
+            <div class="practice-controls-row">
+              <div class="practice-search-container">
+                <svg viewBox="0 0 24 24"><path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"/></svg>
+                <input type="text" class="practice-search-input" id="practice-search" placeholder="Search practice scenarios...">
+              </div>
+              <div class="practice-filter-group">
+                <button class="practice-filter-btn active" onclick="filterPractice('all')">All</button>
+                <button class="practice-filter-btn" onclick="filterPractice('INNER JOIN')">INNER</button>
+                <button class="practice-filter-btn" onclick="filterPractice('LEFT JOIN')">LEFT</button>
+                <button class="practice-filter-btn" onclick="filterPractice('RIGHT JOIN')">RIGHT</button>
+                <button class="practice-filter-btn" onclick="filterPractice('FULL OUTER JOIN')">FULL</button>
+                <button class="practice-filter-btn" onclick="filterPractice('CROSS JOIN')">CROSS</button>
+                <button class="practice-filter-btn" onclick="filterPractice('SELF JOIN')">SELF</button>
+              </div>
+              <button class="btn btn-primary" onclick="randomizePracticeCard()">Random Card <span class="keyboard-shortcut-hint">R</span></button>
+            </div>
+
+            <div class="cards-grid" id="practice-cards-container">
+              <!-- JS Inject -->
+            </div>
+
+            <div class="practice-pagination-container">
+              <div class="practice-page-info" id="practice-page-info">
+                Showing 1-10 of 100 questions
+              </div>
+              <div class="practice-pagination-btns">
+                <button class="btn" id="btn-practice-prev" onclick="prevPracticePage()">Prev</button>
+                <button class="btn" id="btn-practice-next" onclick="nextPracticePage()">Next</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+
+  </div>
+
+  <!-- -------------------------------------------------------------
+       Keyboard Shortcuts Help Modal
+       ------------------------------------------------------------- -->
+  <div class="shortcuts-help-overlay" id="shortcuts-overlay" onclick="closeShortcutsModal()">
+    <div class="shortcuts-help-modal" onclick="event.stopPropagation()">
+      <div class="shortcuts-modal-title">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="var(--color-left)"><path d="M20 18H4V6H20M20 4H4C2.89 4 2 4.89 2 6V18A2,2 0 0,0 4 20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4M11 8H13V10H11M11 14H13V16H11M8 8H10V10H8M8 14H10V16H8M5 8H7V10H5M5 14H7V16H5M14 8H16V10H14M14 14H16V16H14M17 8H19V10H17M17 14H19V16H17M9 11H15V13H9"/></svg>
+        <span>Keyboard Shortcuts</span>
+      </div>
+      <div class="shortcut-row">
+        <span>Focus Global Search</span>
+        <div class="shortcut-keys"><span class="shortcut-key">/</span></div>
+      </div>
+      <div class="shortcut-row">
+        <span>Clear Search / Escape Modal</span>
+        <div class="shortcut-keys"><span class="shortcut-key">Esc</span></div>
+      </div>
+      <div class="shortcut-row">
+        <span>Randomize Practice Challenge</span>
+        <div class="shortcut-keys"><span class="shortcut-key">R</span></div>
+      </div>
+      <div class="shortcut-row">
+        <span>Open Cheat Sheet Print View</span>
+        <div class="shortcut-keys"><span class="shortcut-key">P</span></div>
+      </div>
+      <div style="margin-top: 24px; text-align: right;">
+        <button class="btn btn-primary" onclick="closeShortcutsModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- -------------------------------------------------------------
+       Script Tag injecting datasets & rendering logic
+       ------------------------------------------------------------- -->
+  <script>
+    // Injectable JSON Data Constants from Build pipeline
+    const DATA_TRANSLATOR = [
+  {
+    "phrase": "Only matching records",
+    "meaning": "Rows that have corresponding keys in both tables",
+    "join": "INNER JOIN"
+  },
+  {
+    "phrase": "Employees who have departments",
+    "meaning": "Match employees to departments; exclude employees with no department and departments with no employees",
+    "join": "INNER JOIN"
+  },
+  {
+    "phrase": "Students who submitted assignments",
+    "meaning": "Match students to assignments; exclude students who haven't submitted",
+    "join": "INNER JOIN"
+  },
+  {
+    "phrase": "Customers who placed orders",
+    "meaning": "Match customers to orders; exclude customers who haven't ordered yet",
+    "join": "INNER JOIN"
+  },
+  {
+    "phrase": "Return all employees even if department doesn't exist",
+    "meaning": "Keep all employees; show NULL department info if unmatched",
+    "join": "LEFT JOIN"
+  },
+  {
+    "phrase": "Include employees without department",
+    "meaning": "Keep all employees; fill missing department columns with NULL",
+    "join": "LEFT JOIN"
+  },
+  {
+    "phrase": "Keep all employees",
+    "meaning": "Preserve every row in the Left (Employee) table",
+    "join": "LEFT JOIN"
+  },
+  {
+    "phrase": "Department may be NULL",
+    "meaning": "Keep all Left table records; matching Right records are optional",
+    "join": "LEFT JOIN"
+  },
+  {
+    "phrase": "Show every department even if nobody works there",
+    "meaning": "Keep all departments (Right table) and match employees if any",
+    "join": "RIGHT JOIN"
+  },
+  {
+    "phrase": "Keep all departments",
+    "meaning": "Preserve every row in the Right (Department) table",
+    "join": "RIGHT JOIN"
+  },
+  {
+    "phrase": "Return everything",
+    "meaning": "Keep all records from both tables; match where possible, else NULL",
+    "join": "FULL OUTER JOIN"
+  },
+  {
+    "phrase": "Include unmatched rows from both sides",
+    "meaning": "Keep all rows from both tables, filling mismatches with NULL",
+    "join": "FULL OUTER JOIN"
+  },
+  {
+    "phrase": "Keep all rows from both tables",
+    "meaning": "Preserve all records from both Left and Right tables",
+    "join": "FULL OUTER JOIN"
+  },
+  {
+    "phrase": "Intersection of both datasets",
+    "meaning": "Only rows present in both tables",
+    "join": "INNER JOIN"
+  },
+  {
+    "phrase": "Both tables must have a match",
+    "meaning": "Exclude rows from either table that lack a corresponding key",
+    "join": "INNER JOIN"
+  },
+  {
+    "phrase": "Active users with completed transactions",
+    "meaning": "Only show users who have matches in transactions table",
+    "join": "INNER JOIN"
+  },
+  {
+    "phrase": "Authors who have published books",
+    "meaning": "Exclude authors with no books, and exclude books with no author details",
+    "join": "INNER JOIN"
+  },
+  {
+    "phrase": "Show products that have sales history",
+    "meaning": "Only show products that match a sale transaction key",
+    "join": "INNER JOIN"
+  },
+  {
+    "phrase": "List patients who have appointments",
+    "meaning": "Exclude patients with no appointments and appointments with no patients",
+    "join": "INNER JOIN"
+  },
+  {
+    "phrase": "Show orders that have been shipped by a shipper",
+    "meaning": "Match orders and shippers; exclude unmatched records",
+    "join": "INNER JOIN"
+  },
+  {
+    "phrase": "Display courses that have enrolled students",
+    "meaning": "Only show courses matching at least one student enrollment",
+    "join": "INNER JOIN"
+  },
+  {
+    "phrase": "Find matching rows in both sources",
+    "meaning": "Rows with keys existing in both systems",
+    "join": "INNER JOIN"
+  },
+  {
+    "phrase": "Show users and their active sessions",
+    "meaning": "Exclude users with no sessions and orphaned sessions",
+    "join": "INNER JOIN"
+  },
+  {
+    "phrase": "Retrieve drivers with assigned cars",
+    "meaning": "Exclude drivers without cars and cars without drivers",
+    "join": "INNER JOIN"
+  },
+  {
+    "phrase": "Show students with their grades",
+    "meaning": "Match student to grade record; exclude students with no grade",
+    "join": "INNER JOIN"
+  },
+  {
+    "phrase": "Match orders with invoices",
+    "meaning": "Only return orders that have been invoiced",
+    "join": "INNER JOIN"
+  },
+  {
+    "phrase": "Find suppliers for our inventory items",
+    "meaning": "Only show inventory items with a matching supplier",
+    "join": "INNER JOIN"
+  },
+  {
+    "phrase": "Show transactions belonging to accounts",
+    "meaning": "Only matching transactions and accounts",
+    "join": "INNER JOIN"
+  },
+  {
+    "phrase": "Display employees and their projects",
+    "meaning": "Only show employees assigned to projects and vice versa",
+    "join": "INNER JOIN"
+  },
+  {
+    "phrase": "List matches between A and B",
+    "meaning": "Strict inner match",
+    "join": "INNER JOIN"
+  },
+  {
+    "phrase": "All employees and their department details if any",
+    "meaning": "Show all employees; department info is optional",
+    "join": "LEFT JOIN"
+  },
+  {
+    "phrase": "Show all customers and their orders if they have placed any",
+    "meaning": "All customers; orders are optional (NULL if none)",
+    "join": "LEFT JOIN"
+  },
+  {
+    "phrase": "List all products and their sales details, including unsold products",
+    "meaning": "All products; sales details are optional",
+    "join": "LEFT JOIN"
+  },
+  {
+    "phrase": "Include users who have not logged in",
+    "meaning": "Keep all users; session details can be NULL",
+    "join": "LEFT JOIN"
+  },
+  {
+    "phrase": "Retrieve all authors and their books (show NULL for authors with no books)",
+    "meaning": "Keep all authors; books are optional",
+    "join": "LEFT JOIN"
+  },
+  {
+    "phrase": "Show every student and their enrolled course (if any)",
+    "meaning": "Keep all students; courses are optional",
+    "join": "LEFT JOIN"
+  },
+  {
+    "phrase": "List all patients and their appointments (even if they have none scheduled)",
+    "meaning": "Keep all patients; appointments are optional",
+    "join": "LEFT JOIN"
+  },
+  {
+    "phrase": "All flights and passenger details (include empty flights)",
+    "meaning": "Keep all flights; passengers are optional",
+    "join": "LEFT JOIN"
+  },
+  {
+    "phrase": "Show all accounts and their transactions, including inactive accounts",
+    "meaning": "Keep all accounts; transactions are optional",
+    "join": "LEFT JOIN"
+  },
+  {
+    "phrase": "List every team and their members, including teams with zero members",
+    "meaning": "Keep all teams; members are optional",
+    "join": "LEFT JOIN"
+  },
+  {
+    "phrase": "Show all departments, along with working employees (if any)",
+    "meaning": "Keep all departments (placed on Left) and working employees",
+    "join": "LEFT JOIN"
+  },
+  {
+    "phrase": "List all properties, including those not currently rented",
+    "meaning": "Keep all properties; rental details can be NULL",
+    "join": "LEFT JOIN"
+  },
+  {
+    "phrase": "Include applicants who haven't submitted documents",
+    "meaning": "Keep all applicants; documents are optional",
+    "join": "LEFT JOIN"
+  },
+  {
+    "phrase": "List every vendor and their products, including vendors with no products",
+    "meaning": "Keep all vendors; products are optional",
+    "join": "LEFT JOIN"
+  },
+  {
+    "phrase": "Show all courses, including those with zero student registrations",
+    "meaning": "Keep all courses; registrations are optional",
+    "join": "LEFT JOIN"
+  },
+  {
+    "phrase": "All departments, and employees assigned to them (even if empty)",
+    "meaning": "Show all departments, regardless of employee count",
+    "join": "LEFT JOIN"
+  },
+  {
+    "phrase": "List all events and registration count, including events with no sign-ups",
+    "meaning": "Keep all events; registrations are optional",
+    "join": "LEFT JOIN"
+  },
+  {
+    "phrase": "Include items not matched in the second table",
+    "meaning": "Keep all rows from the Left table",
+    "join": "LEFT JOIN"
+  },
+  {
+    "phrase": "All records from the Left side plus matches from the Right",
+    "meaning": "Standard definition of Left Outer Join",
+    "join": "LEFT JOIN"
+  },
+  {
+    "phrase": "Retain all rows from Table A",
+    "meaning": "Keep everything in Table A (Left table)",
+    "join": "LEFT JOIN"
+  },
+  {
+    "phrase": "All departments, and employees if there are any working there",
+    "meaning": "If departments is the Right table, show all departments",
+    "join": "RIGHT JOIN"
+  },
+  {
+    "phrase": "Retrieve all orders and their customer names (include orders with no customer account)",
+    "meaning": "If orders is Right table, keep all orders; customer is optional",
+    "join": "RIGHT JOIN"
+  },
+  {
+    "phrase": "List all assets, showing assigned employees (even if unassigned)",
+    "meaning": "If assets is Right table, keep all assets",
+    "join": "RIGHT JOIN"
+  },
+  {
+    "phrase": "Keep all rows in Table B, matching Table A",
+    "meaning": "Preserve Right table (Table B)",
+    "join": "RIGHT JOIN"
+  },
+  {
+    "phrase": "Show every project, along with assigned employees (include empty projects)",
+    "meaning": "If projects is Right table, keep all projects",
+    "join": "RIGHT JOIN"
+  },
+  {
+    "phrase": "List all categories and products (include categories with no products)",
+    "meaning": "If categories is Right table, keep all categories",
+    "join": "RIGHT JOIN"
+  },
+  {
+    "phrase": "Include all stores and their sales (even stores with no sales)",
+    "meaning": "If stores is Right table, keep all stores",
+    "join": "RIGHT JOIN"
+  },
+  {
+    "phrase": "All courses and student enrollments (include courses with no enrollments)",
+    "meaning": "If courses is Right table, keep all courses",
+    "join": "RIGHT JOIN"
+  },
+  {
+    "phrase": "Keep every row from the second table",
+    "meaning": "Preserve all rows in the Right table",
+    "join": "RIGHT JOIN"
+  },
+  {
+    "phrase": "Retrieve all shippers and their shipped orders, including shippers with no orders",
+    "meaning": "If shippers is Right table, keep all shippers",
+    "join": "RIGHT JOIN"
+  },
+  {
+    "phrase": "Show every publisher and books they published (including publishers with no books)",
+    "meaning": "If publishers is Right table, keep all publishers",
+    "join": "RIGHT JOIN"
+  },
+  {
+    "phrase": "All regions and their sales figures (include regions with no sales record)",
+    "meaning": "If regions is Right table, keep all regions",
+    "join": "RIGHT JOIN"
+  },
+  {
+    "phrase": "Show all doctors and their patient logs, even doctors who haven't seen patients",
+    "meaning": "If doctors is Right table, keep all doctors",
+    "join": "RIGHT JOIN"
+  },
+  {
+    "phrase": "Keep all Right table records",
+    "meaning": "Preserve all records from the Right table",
+    "join": "RIGHT JOIN"
+  },
+  {
+    "phrase": "Right Outer Join",
+    "meaning": "Return all rows from Right table, plus matches from Left table",
+    "join": "RIGHT JOIN"
+  },
+  {
+    "phrase": "Show all employees and all departments, unmatched on both sides included",
+    "meaning": "Keep all employees and all departments; fill mismatches with NULL",
+    "join": "FULL OUTER JOIN"
+  },
+  {
+    "phrase": "Complete outer join",
+    "meaning": "Union of Left Outer Join and Right Outer Join",
+    "join": "FULL OUTER JOIN"
+  },
+  {
+    "phrase": "Show all customers and all orders, including unmatched customers and orders",
+    "meaning": "Keep all customers and all orders",
+    "join": "FULL OUTER JOIN"
+  },
+  {
+    "phrase": "All products and all sales promotions, matching or not",
+    "meaning": "Keep all products and all promotions",
+    "join": "FULL OUTER JOIN"
+  },
+  {
+    "phrase": "Include all unmatched rows from both tables",
+    "meaning": "Show everything from both Left and Right tables",
+    "join": "FULL OUTER JOIN"
+  },
+  {
+    "phrase": "Show all students and all courses, even if students aren't enrolled or courses are empty",
+    "meaning": "Keep all students and courses",
+    "join": "FULL OUTER JOIN"
+  },
+  {
+    "phrase": "Both tables are preserved entirely",
+    "meaning": "No records are filtered out from either side",
+    "join": "FULL OUTER JOIN"
+  },
+  {
+    "phrase": "Full Outer Join",
+    "meaning": "Keep every row from both tables",
+    "join": "FULL OUTER JOIN"
+  },
+  {
+    "phrase": "Union of matching and non-matching rows from both sides",
+    "meaning": "Complete outer dataset matching",
+    "join": "FULL OUTER JOIN"
+  },
+  {
+    "phrase": "Display all users and all subscription plans (active, inactive, or empty)",
+    "meaning": "Keep all users and all subscription plans",
+    "join": "FULL OUTER JOIN"
+  },
+  {
+    "phrase": "Show all projects and all resources, regardless of assignment status",
+    "meaning": "Keep all projects and all resources",
+    "join": "FULL OUTER JOIN"
+  },
+  {
+    "phrase": "List all branches and all managers, even branches without managers and managers without branches",
+    "meaning": "Keep all branches and managers",
+    "join": "FULL OUTER JOIN"
+  },
+  {
+    "phrase": "Retrieve all orders and all shipments, including order-less shipments and shipment-less orders",
+    "meaning": "Keep all orders and shipments",
+    "join": "FULL OUTER JOIN"
+  },
+  {
+    "phrase": "Total outer join",
+    "meaning": "Preserves both tables entirely",
+    "join": "FULL OUTER JOIN"
+  },
+  {
+    "phrase": "All rows from A and B, matching where matching, NULL otherwise",
+    "meaning": "Standard Full Outer Join logical description",
+    "join": "FULL OUTER JOIN"
+  },
+  {
+    "phrase": "All possible combinations of rows",
+    "meaning": "Produce Cartesian product of both tables",
+    "join": "CROSS JOIN"
+  },
+  {
+    "phrase": "Cartesian product",
+    "meaning": "Every row of Left table paired with every row of Right table",
+    "join": "CROSS JOIN"
+  },
+  {
+    "phrase": "Every combination of sizes and colors",
+    "meaning": "Generate all possible size-color pairs (Cartesian product)",
+    "join": "CROSS JOIN"
+  },
+  {
+    "phrase": "List all products against all store locations",
+    "meaning": "Generate all store-product combinations",
+    "join": "CROSS JOIN"
+  },
+  {
+    "phrase": "Cross join",
+    "meaning": "Every row of A matched with every row of B",
+    "join": "CROSS JOIN"
+  },
+  {
+    "phrase": "Permutations of two datasets",
+    "meaning": "All combinations without a join filter",
+    "join": "CROSS JOIN"
+  },
+  {
+    "phrase": "Generate all pairs",
+    "meaning": "Cartesian product of Left and Right tables",
+    "join": "CROSS JOIN"
+  },
+  {
+    "phrase": "Compare a table to itself",
+    "meaning": "Join a table on a different alias of itself",
+    "join": "SELF JOIN"
+  },
+  {
+    "phrase": "Find employees and their managers",
+    "meaning": "Join employee table with itself on manager_id = employee_id",
+    "join": "SELF JOIN"
+  },
+  {
+    "phrase": "Find pairs of students in the same class",
+    "meaning": "Self-join student table on class_id with student_id != student_id",
+    "join": "SELF JOIN"
+  },
+  {
+    "phrase": "Find duplicate records within a table",
+    "meaning": "Self-join on duplicate fields with unique id mismatch",
+    "join": "SELF JOIN"
+  },
+  {
+    "phrase": "Retrieve organizational hierarchy",
+    "meaning": "Self-join to find supervisor-subordinate relationships",
+    "join": "SELF JOIN"
+  },
+  {
+    "phrase": "Find products with the same price",
+    "meaning": "Self-join product table on price with different ids",
+    "join": "SELF JOIN"
+  },
+  {
+    "phrase": "Self match",
+    "meaning": "Join table A with itself",
+    "join": "SELF JOIN"
+  },
+  {
+    "phrase": "Equi-join on columns with the same name",
+    "meaning": "Match columns having identical names automatically",
+    "join": "NATURAL JOIN / USING"
+  },
+  {
+    "phrase": "Join using specific column name in parentheses",
+    "meaning": "Short syntax for joining identical column name e.g. USING(id)",
+    "join": "USING()"
+  },
+  {
+    "phrase": "Automatic match of common column names",
+    "meaning": "NATURAL JOIN matches all fields with matching names",
+    "join": "NATURAL JOIN"
+  },
+  {
+    "phrase": "Clean output without duplicate column names",
+    "meaning": "USING() or NATURAL JOIN filters out duplicate columns in SELECT *",
+    "join": "USING() / NATURAL"
+  },
+  {
+    "phrase": "Shortcut for ON a.id = b.id when columns match",
+    "meaning": "Use USING(id) to simplify syntax",
+    "join": "USING()"
+  },
+  {
+    "phrase": "Natural match on key",
+    "meaning": "NATURAL JOIN matches common column names",
+    "join": "NATURAL JOIN"
+  }
+];
+    const DATA_PATTERNS = [
+  {
+    "say": "All X, even if they don't have Y",
+    "think": "We must preserve all records from table X. Standard left-to-right logic dictates table X is on the left.",
+    "join": "LEFT JOIN"
+  },
+  {
+    "say": "X who have Y",
+    "think": "Strict match. Only keep rows that exist in both tables.",
+    "join": "INNER JOIN"
+  },
+  {
+    "say": "Include X without Y",
+    "think": "X must be fully preserved. Y is optional and can be NULL.",
+    "join": "LEFT JOIN"
+  },
+  {
+    "say": "Keep all Y (where Y is the second table)",
+    "think": "We need to preserve all records of the second table. We can use RIGHT JOIN or swap tables and use LEFT JOIN.",
+    "join": "RIGHT JOIN"
+  },
+  {
+    "say": "Return everything from both",
+    "think": "Preserve all records from both tables. Unmatched rows from either side will be padded with NULLs.",
+    "join": "FULL OUTER JOIN"
+  },
+  {
+    "say": "Matching records only",
+    "think": "Filter out unmatched rows from both tables. Standard intersection.",
+    "join": "INNER JOIN"
+  },
+  {
+    "say": "All combinations of X and Y",
+    "think": "Cartesian product. Match every row of table X with every row of table Y.",
+    "join": "CROSS JOIN"
+  },
+  {
+    "say": "Compare table X to itself",
+    "think": "Join the table to a copy of itself. Requires distinct table aliases.",
+    "join": "SELF JOIN"
+  },
+  {
+    "say": "Active and inactive accounts",
+    "think": "All accounts must be listed, regardless of active transaction records.",
+    "join": "LEFT JOIN"
+  },
+  {
+    "say": "Only accounts with transactions",
+    "think": "Strict match between accounts and transactions.",
+    "join": "INNER JOIN"
+  },
+  {
+    "say": "If department missing, show NULL",
+    "think": "Employees is the primary table. If department is missing, we still want the employee.",
+    "join": "LEFT JOIN"
+  },
+  {
+    "say": "Only assigned projects",
+    "think": "Strict match. Exclude employees without projects and projects without employees.",
+    "join": "INNER JOIN"
+  },
+  {
+    "say": "All projects, even unassigned ones",
+    "think": "Preserve the project table. Projects are on the Left or Right depending on join order.",
+    "join": "LEFT / RIGHT JOIN"
+  },
+  {
+    "say": "Every combination of sizes and colors",
+    "think": "No join condition exists; we want the Cartesian product of sizes and colors.",
+    "join": "CROSS JOIN"
+  },
+  {
+    "say": "Employees and their supervisors",
+    "think": "Hierarchy relationship in a single table. Match supervisor_id to employee_id.",
+    "join": "SELF JOIN"
+  },
+  {
+    "say": "Customers who haven't placed orders",
+    "think": "Use LEFT JOIN, then filter where the order ID is NULL.",
+    "join": "LEFT JOIN (with IS NULL)"
+  },
+  {
+    "say": "Products never sold",
+    "think": "Left join products to sales, then filter where sale_id IS NULL.",
+    "join": "LEFT JOIN (with IS NULL)"
+  },
+  {
+    "say": "Find siblings in database",
+    "think": "Match person table to itself where parents match but person IDs differ.",
+    "join": "SELF JOIN"
+  },
+  {
+    "say": "Generate grid of store locations and dates",
+    "think": "Cartesian product of locations and dates to build a reporting grid.",
+    "join": "CROSS JOIN"
+  },
+  {
+    "say": "Complete union of employee and volunteer rosters",
+    "think": "All employees and all volunteers, including those who are only one or the other.",
+    "join": "FULL OUTER JOIN"
+  },
+  {
+    "say": "Overlapping customers between regional databases",
+    "think": "Only keep customers that exist in both regional tables.",
+    "join": "INNER JOIN"
+  },
+  {
+    "say": "Show all departments, along with employee counts (including 0)",
+    "think": "Keep all departments. Left join departments to employees, group, and count.",
+    "join": "LEFT JOIN"
+  },
+  {
+    "say": "Match on columns with identical names",
+    "think": "Use NATURAL JOIN or USING clause for cleaner syntax.",
+    "join": "NATURAL JOIN / USING"
+  },
+  {
+    "say": "Unmatched items from both sides",
+    "think": "Retrieve rows that do not match in either table. Full Outer Join filtered with IS NULL.",
+    "join": "FULL OUTER JOIN"
+  },
+  {
+    "say": "All students and their test scores (including students who missed tests)",
+    "think": "Preserve students. Left join to test scores.",
+    "join": "LEFT JOIN"
+  },
+  {
+    "say": "Courses with or without registrations",
+    "think": "Keep all courses. Left join to registrations.",
+    "join": "LEFT JOIN"
+  },
+  {
+    "say": "Shippers and their orders (including shippers with no shipments)",
+    "think": "If shippers is first, LEFT JOIN orders. If shippers is second, RIGHT JOIN.",
+    "join": "LEFT / RIGHT JOIN"
+  },
+  {
+    "say": "Generate test matrix of users and test cases",
+    "think": "Every user combined with every test case to evaluate coverage.",
+    "join": "CROSS JOIN"
+  },
+  {
+    "say": "Find managers who report to other managers",
+    "think": "Hierarchy query joining the manager/employee table with itself.",
+    "join": "SELF JOIN"
+  },
+  {
+    "say": "Match items with identical keys in both tables",
+    "think": "Strict match. Exclude non-matching rows.",
+    "join": "INNER JOIN"
+  },
+  {
+    "say": "Keep Table A rows intact",
+    "think": "Ensure every row in Table A (Left table) appears in output.",
+    "join": "LEFT JOIN"
+  },
+  {
+    "say": "Keep Table B rows intact",
+    "think": "Ensure every row in Table B (Right table) appears in output.",
+    "join": "RIGHT JOIN"
+  },
+  {
+    "say": "List patients who have never checked in",
+    "think": "Left join patients to check-ins, then filter for NULL check-in IDs.",
+    "join": "LEFT JOIN (with IS NULL)"
+  },
+  {
+    "say": "List empty rooms in hotel",
+    "think": "Left join rooms to bookings (on active date), filter for NULL booking IDs.",
+    "join": "LEFT JOIN (with IS NULL)"
+  },
+  {
+    "say": "Show items where manufacturer is optional",
+    "think": "Keep all items; match manufacturer if details exist.",
+    "join": "LEFT JOIN"
+  },
+  {
+    "say": "Display all users and their uploaded files, including file-less users",
+    "think": "Keep all users; files table is optional.",
+    "join": "LEFT JOIN"
+  },
+  {
+    "say": "Strict intersection of sets A and B",
+    "think": "Return only rows that reside in both sets.",
+    "join": "INNER JOIN"
+  },
+  {
+    "say": "Full cartesian product of two tables",
+    "think": "Multiply every row of A by every row of B.",
+    "join": "CROSS JOIN"
+  },
+  {
+    "say": "Reconcile two bank registers (match or not)",
+    "think": "Show all items from both registers to check for discrepancies.",
+    "join": "FULL OUTER JOIN"
+  },
+  {
+    "say": "Students in the same dorm room",
+    "think": "Self-join students table on dorm_id where student_id != student_id.",
+    "join": "SELF JOIN"
+  },
+  {
+    "say": "Verify that primary key matches foreign key exactly",
+    "think": "Classic inner join logic.",
+    "join": "INNER JOIN"
+  },
+  {
+    "say": "All orders, including guest checkouts without a customer record",
+    "think": "Preserve all orders. If orders is on the right, use RIGHT JOIN.",
+    "join": "RIGHT JOIN"
+  },
+  {
+    "say": "Show all doctors and patients, regardless of appointment schedules",
+    "think": "Preserve both tables. Show all doctors and all patients.",
+    "join": "FULL OUTER JOIN"
+  },
+  {
+    "say": "Find products priced higher than other products in the same category",
+    "think": "Self-join on category with price comparison condition.",
+    "join": "SELF JOIN"
+  },
+  {
+    "say": "List departments and their assets (include assets with no department assigned)",
+    "think": "Keep all assets. If assets is on the right, use RIGHT JOIN.",
+    "join": "RIGHT JOIN"
+  },
+  {
+    "say": "Match transactions using the 'account_id' column common to both",
+    "think": "Can use USING(account_id) or standard ON clause.",
+    "join": "USING() / ON"
+  },
+  {
+    "say": "Compare current year sales to previous year sales",
+    "think": "Self-join sales table matching on product_id and year = year + 1.",
+    "join": "SELF JOIN"
+  },
+  {
+    "say": "Display all flights and airports (include airports with no flights and flights with no airport)",
+    "think": "Preserve both datasets completely.",
+    "join": "FULL OUTER JOIN"
+  },
+  {
+    "say": "Show matching customer and order details",
+    "think": "Strict match, discard unmatched rows.",
+    "join": "INNER JOIN"
+  },
+  {
+    "say": "Every employee matched against every project (to assign hours)",
+    "think": "Cartesian product to list all potential pairings.",
+    "join": "CROSS JOIN"
+  }
+];
+    const DATA_MISTAKES = [
+  {
+    "id": 1,
+    "name": "Filtering the Right Table in the WHERE Clause (LEFT JOIN conversion)",
+    "explain": "Applying a WHERE filter to columns of the RIGHT table after a LEFT JOIN filters out the NULL values generated for unmatched rows. This effectively converts the LEFT JOIN into an INNER JOIN.",
+    "bad": "SELECT e.name, d.name\nFROM employees e\nLEFT JOIN departments d ON e.department_id = d.id\nWHERE d.status = 'Active'; -- Filters out NULL departments, killing LEFT JOIN behavior!",
+    "good": "SELECT e.name, d.name\nFROM employees e\nLEFT JOIN departments d ON e.department_id = d.id AND d.status = 'Active';\n-- OR if you need to handle NULLs explicitly:\n-- WHERE (d.status = 'Active' OR d.id IS NULL);"
+  },
+  {
+    "id": 2,
+    "name": "Omitting the JOIN Condition (Accidental Cartesian Product)",
+    "explain": "Forgetting the ON clause or USING clause causes the database to perform a CROSS JOIN (Cartesian product), pairing every row of the first table with every row of the second table.",
+    "bad": "SELECT e.name, d.name\nFROM employees e\nINNER JOIN departments d; -- Missing ON condition",
+    "good": "SELECT e.name, d.name\nFROM employees e\nINNER JOIN departments d ON e.department_id = d.id;"
+  },
+  {
+    "id": 3,
+    "name": "Using NATURAL JOIN on tables with shared metadata columns",
+    "explain": "NATURAL JOIN matches tables on ALL columns with matching names. If both tables contain columns like 'created_at', 'updated_at', or 'status', it will attempt to match on those, leading to empty result sets.",
+    "bad": "SELECT * \nFROM orders\nNATURAL JOIN customers; -- Matches on 'id' AND 'created_at', which is incorrect",
+    "good": "SELECT * \nFROM orders o\nINNER JOIN customers c ON o.customer_id = c.id;"
+  },
+  {
+    "id": 4,
+    "name": "Wrong Join Key (Joining on columns with different meanings)",
+    "explain": "Accidentally joining on columns that have similar names but completely different business keys, such as joining an employee's department_id to a department's name.",
+    "bad": "SELECT e.name, d.name\nFROM employees e\nINNER JOIN departments d ON e.department_id = d.name; -- Mismatched types and keys",
+    "good": "SELECT e.name, d.name\nFROM employees e\nINNER JOIN departments d ON e.department_id = d.id;"
+  },
+  {
+    "id": 5,
+    "name": "Missing Table Aliases with Duplicate Column Names",
+    "explain": "When joining tables that have columns with identical names (e.g., 'id', 'name', 'created_at'), failing to use table aliases in the SELECT or ON clause results in an 'Ambiguous Column Name' error.",
+    "bad": "SELECT name, title\nFROM employees\nINNER JOIN projects ON project_id = id; -- Which table's 'id' or 'name'?",
+    "good": "SELECT e.name AS employee_name, p.title AS project_title\nFROM employees e\nINNER JOIN projects p ON e.project_id = p.id;"
+  },
+  {
+    "id": 6,
+    "name": "Accidental Row Multiplication (Joining on Non-Unique Keys)",
+    "explain": "Joining tables on columns that contain duplicate values in both tables causes a many-to-many match, multiplying the output row count exponentially.",
+    "bad": "SELECT e.name, d.name\nFROM employees e\nINNER JOIN departments d ON e.location_id = d.location_id; -- Many employees and many departments share locations, leading to duplicated employee rows",
+    "good": "SELECT e.name, d.name\nFROM employees e\nINNER JOIN departments d ON e.department_id = d.id; -- Join on unique primary key instead"
+  },
+  {
+    "id": 7,
+    "name": "Attempting to match NULL values in an ON clause",
+    "explain": "In SQL, NULL represents an unknown value. The comparison 'NULL = NULL' evaluates to UNKNOWN (not TRUE). Therefore, rows with NULL keys will never match using standard equi-joins.",
+    "bad": "SELECT e.name, d.name\nFROM employees e\nINNER JOIN departments d ON e.department_id = d.id; -- Fails to match employees where department_id IS NULL",
+    "good": "SELECT e.name, d.name\nFROM employees e\nLEFT JOIN departments d ON e.department_id = d.id; -- Keeps employees with NULL departments"
+  },
+  {
+    "id": 8,
+    "name": "Incorrect Join Order in Multi-Table Outer Joins",
+    "explain": "If you follow a LEFT JOIN with an INNER JOIN, you can easily filter out the NULL records generated by the LEFT JOIN if the INNER JOIN filters on the same path.",
+    "bad": "SELECT e.name, d.name, p.title\nFROM employees e\nLEFT JOIN departments d ON e.department_id = d.id\nINNER JOIN projects p ON d.project_id = p.id; -- If d.id is NULL, d.project_id is NULL. INNER JOIN on p.id fails, dropping the employee!",
+    "good": "SELECT e.name, d.name, p.title\nFROM employees e\nLEFT JOIN departments d ON e.department_id = d.id\nLEFT JOIN projects p ON d.project_id = p.id; -- Keeps the optional chain intact"
+  },
+  {
+    "id": 9,
+    "name": "Using FULL JOIN in MySQL (Syntax Error)",
+    "explain": "MySQL does not natively support FULL OUTER JOIN. Writing FULL JOIN directly in MySQL results in a syntax error.",
+    "bad": "SELECT e.name, d.name\nFROM employees e\nFULL OUTER JOIN departments d ON e.department_id = d.id; -- Fails in MySQL",
+    "good": "SELECT e.name, d.name\nFROM employees e\nLEFT JOIN departments d ON e.department_id = d.id\nUNION\nSELECT e.name, d.name\nFROM employees e\nRIGHT JOIN departments d ON e.department_id = d.id; -- Emulates FULL JOIN in MySQL"
+  },
+  {
+    "id": 10,
+    "name": "Placing Filters in the ON Clause of an INNER JOIN (Redundancy)",
+    "explain": "In an INNER JOIN, placing filters in the ON clause vs the WHERE clause yields the exact same logical result, but putting non-joining logic in the ON clause hurts code readability.",
+    "bad": "SELECT e.name, d.name\nFROM employees e\nINNER JOIN departments d ON e.department_id = d.id AND e.salary > 100000; -- Mixing join logic and filter logic",
+    "good": "SELECT e.name, d.name\nFROM employees e\nINNER JOIN departments d ON e.department_id = d.id\nWHERE e.salary > 100000; -- Clean separation of concerns"
+  },
+  {
+    "id": 11,
+    "name": "Placing Filters on the LEFT Table in the ON Clause of a LEFT JOIN",
+    "explain": "In a LEFT JOIN, putting a filter on the Left table inside the ON clause does NOT reduce the number of rows in the output. The Left table rows are still kept, but the Right columns will be padded with NULLs for rows that don't match the condition.",
+    "bad": "SELECT e.name, d.name\nFROM employees e\nLEFT JOIN departments d ON e.department_id = d.id AND e.country = 'USA'; -- USA employees get department info; other employees are still kept but have NULL departments!",
+    "good": "SELECT e.name, d.name\nFROM employees e\nLEFT JOIN departments d ON e.department_id = d.id\nWHERE e.country = 'USA'; -- Correctly filters output to show ONLY USA employees"
+  },
+  {
+    "id": 12,
+    "name": "Using DISTINCT to Patch a Bad Join Condition",
+    "explain": "If your join is returning duplicate records, it is usually because the join keys are not unique. Relying on DISTINCT to fix the duplication is a performance anti-pattern that masks the underlying database relationship issue.",
+    "bad": "SELECT DISTINCT e.name, d.name\nFROM employees e\nINNER JOIN departments d ON e.city = d.city; -- Using DISTINCT to hide duplicates generated by bad city match",
+    "good": "SELECT e.name, d.name\nFROM employees e\nINNER JOIN departments d ON e.department_id = d.id; -- Proper primary key - foreign key match"
+  },
+  {
+    "id": 13,
+    "name": "Joining on Mismatched Data Types",
+    "explain": "Joining a VARCHAR column to an INT column forces the database to perform implicit type conversion on every row, disabling index usage and causing severe performance degradation.",
+    "bad": "SELECT e.name, d.name\nFROM employees e\nINNER JOIN departments d ON e.dept_code_string = d.id; -- Code string joined to integer id",
+    "good": "SELECT e.name, d.name\nFROM employees e\nINNER JOIN departments d ON CAST(e.dept_code_string AS INT) = d.id; -- Explicit conversion (if keys cannot be corrected in schema)"
+  },
+  {
+    "id": 14,
+    "name": "USING() Namespace Collisions",
+    "explain": "While USING(id) is convenient, it requires that BOTH tables have a column with that exact name. If both tables have 'id' but in Table A it represents the primary key and in Table B it represents something else (like parent_id), it will match incorrectly.",
+    "bad": "SELECT * \nFROM tasks\nINNER JOIN users USING(id); -- Matches tasks.id = users.id instead of tasks.user_id = users.id!",
+    "good": "SELECT * \nFROM tasks t\nINNER JOIN users u ON t.user_id = u.id;"
+  },
+  {
+    "id": 15,
+    "name": "Circular Joins (Causing Infinite Loops / Redundancy)",
+    "explain": "Joining table A to B, B to C, and then C back to A on the same keys is redundant and creates closed-loop relationships that can degrade performance and produce incorrect row counts.",
+    "bad": "SELECT *\nFROM employees e\nINNER JOIN departments d ON e.department_id = d.id\nINNER JOIN managers m ON d.manager_id = m.id\nINNER JOIN employees e2 ON m.employee_id = e2.id AND e.id = e2.id; -- Redundant closing of loop",
+    "good": "SELECT *\nFROM employees e\nINNER JOIN departments d ON e.department_id = d.id\nINNER JOIN managers m ON d.manager_id = m.id;"
+  },
+  {
+    "id": 16,
+    "name": "Wrong Table on the Left side of a LEFT JOIN",
+    "explain": "Using a LEFT JOIN but placing the table you want to filter/limit on the left, and the primary table on the right, resulting in missing primary records.",
+    "bad": "SELECT e.name, d.name\nFROM departments d\nLEFT JOIN employees e ON d.id = e.department_id; -- Kept all departments; dropped employees without a department!",
+    "good": "SELECT e.name, d.name\nFROM employees e\nLEFT JOIN departments d ON e.department_id = d.id; -- Correct: Kept all employees"
+  },
+  {
+    "id": 17,
+    "name": "Implicit Join Syntax (Oracle old style comma join) in Modern Code",
+    "explain": "Using commas in the FROM clause and placing join conditions in the WHERE clause is an outdated SQL-89 standard. It makes queries harder to read, error-prone, and can easily cause accidental Cartesian products.",
+    "bad": "SELECT e.name, d.name\nFROM employees e, departments d\nWHERE e.department_id = d.id; -- Ancient comma join syntax",
+    "good": "SELECT e.name, d.name\nFROM employees e\nINNER JOIN departments d ON e.department_id = d.id; -- Modern SQL-92 explicit syntax"
+  },
+  {
+    "id": 18,
+    "name": "Incorrect Aggregate calculations after a One-to-Many Join",
+    "explain": "If you join Table A to a One-to-Many Table B and then SUM a column from Table A, the values from Table A will be duplicated for each matching row in Table B, yielding highly inflated values.",
+    "bad": "SELECT e.id, SUM(e.salary) AS total_salaries -- Salary is duplicated for every project employee has!\nFROM employees e\nLEFT JOIN projects p ON e.id = p.employee_id\nGROUP BY e.id;",
+    "good": "SELECT e.id, e.salary, COUNT(p.id) AS project_count\nFROM employees e\nLEFT JOIN projects p ON e.id = p.employee_id\nGROUP BY e.id, e.salary; -- Keep salary out of aggregate, or calculate totals prior to join"
+  },
+  {
+    "id": 19,
+    "name": "Joining on Inequality Operators without Bounds",
+    "explain": "Joining using non-equi operators (like A.value > B.value) without upper/lower boundaries can lead to a massive fan-out of rows, causing out-of-memory errors on large tables.",
+    "bad": "SELECT *\nFROM transactions t1\nINNER JOIN transactions t2 ON t1.account_id = t2.account_id AND t1.amount > t2.amount; -- Matches every lower transaction, creating huge duplicates",
+    "good": "SELECT *\nFROM transactions t1\nINNER JOIN transactions t2 ON t1.account_id = t2.account_id AND t1.amount > t2.amount\nWHERE t2.amount = (SELECT MAX(amount) FROM transactions WHERE account_id = t1.account_id AND amount < t1.amount); -- Limit matches to nearest neighbor"
+  },
+  {
+    "id": 20,
+    "name": "Using UNION instead of UNION ALL in simulated Full Outer Joins",
+    "explain": "When emulating FULL OUTER JOIN using LEFT JOIN UNION RIGHT JOIN, using UNION (which removes duplicates) is much slower than UNION ALL because it performs an expensive sort operation, and it might remove valid duplicates.",
+    "bad": "SELECT e.name, d.name FROM employees e LEFT JOIN departments d ON e.department_id = d.id\nUNION\nSELECT e.name, d.name FROM employees e RIGHT JOIN departments d ON e.department_id = d.id; -- Triggers slow duplicate sorting",
+    "good": "SELECT e.name, d.name FROM employees e LEFT JOIN departments d ON e.department_id = d.id\nUNION ALL\nSELECT e.name, d.name FROM employees e RIGHT JOIN departments d ON e.department_id = d.id WHERE e.department_id IS NULL; -- Faster, mathematically identical, and does not sort"
+  },
+  {
+    "id": 21,
+    "name": "Assuming Right Join is a distinct operation from Left Join",
+    "explain": "Believing that RIGHT JOIN offers unique capabilities that LEFT JOIN does not, resulting in unreadable queries. A RIGHT JOIN is logically identical to swapping table positions in a LEFT JOIN.",
+    "bad": "SELECT e.name, d.name\nFROM employees e\nRIGHT JOIN departments d ON e.department_id = d.id; -- Less readable (we read left-to-right)",
+    "good": "SELECT e.name, d.name\nFROM departments d\nLEFT JOIN employees e ON d.id = e.department_id; -- Clean and readable equivalent"
+  },
+  {
+    "id": 22,
+    "name": "Joining on Subqueries instead of joining directly",
+    "explain": "Creating subqueries for simple table reads and joining on them is an anti-pattern. Most modern database optimizers perform better when tables are joined directly so indexes can be leveraged directly.",
+    "bad": "SELECT e.name, d.name\nFROM employees e\nINNER JOIN (SELECT * FROM departments) d ON e.department_id = d.id; -- Redundant subquery",
+    "good": "SELECT e.name, d.name\nFROM employees e\nINNER JOIN departments d ON e.department_id = d.id; -- Clean direct join"
+  },
+  {
+    "id": 23,
+    "name": "Accidentally turning CROSS JOIN into INNER JOIN",
+    "explain": "Specifying a CROSS JOIN but then adding a join filter in the WHERE clause defeats the purpose of the CROSS JOIN statement and should be written as a standard INNER JOIN for clarity.",
+    "bad": "SELECT e.name, p.title\nFROM employees e\nCROSS JOIN projects p\nWHERE e.project_id = p.id; -- Confuses reader, looks like Cartesian product but runs as Inner Join",
+    "good": "SELECT e.name, p.title\nFROM employees e\nINNER JOIN projects p ON e.project_id = p.id; -- Explicit and readable"
+  },
+  {
+    "id": 24,
+    "name": "Incorrect SELF JOIN comparison operator (Infinite match)",
+    "explain": "Self-joining a table to find sibling rows or matching records but failing to exclude matching the row to itself.",
+    "bad": "SELECT e1.name, e2.name\nFROM employees e1\nINNER JOIN employees e2 ON e1.department_id = e2.department_id; -- Matches John with John, Sarah with Sarah, etc.",
+    "good": "SELECT e1.name, e2.name\nFROM employees e1\nINNER JOIN employees e2 ON e1.department_id = e2.department_id\nWHERE e1.id <> e2.id; -- Excludes matching the same employee"
+  },
+  {
+    "id": 25,
+    "name": "Hardcoding JOIN keys instead of using columns",
+    "explain": "Using literal string matches or static IDs in the ON clause instead of mapping the primary key and foreign key variables.",
+    "bad": "SELECT e.name, d.name\nFROM employees e\nINNER JOIN departments d ON e.department_id = 5; -- Hardcoded ID in join clause",
+    "good": "SELECT e.name, d.name\nFROM employees e\nINNER JOIN departments d ON e.department_id = d.id\nWHERE d.id = 5; -- Correct join key mapping with WHERE filter"
+  },
+  {
+    "id": 26,
+    "name": "Applying OR in ON clauses blindly",
+    "explain": "Using an OR condition in a JOIN's ON clause (e.g., ON a.id = b.id OR a.email = b.email) prevents the database query planner from utilizing indexes effectively, often causing full table scans.",
+    "bad": "SELECT u.name, c.company_name\nFROM users u\nINNER JOIN companies c ON u.company_id = c.id OR u.email = c.domain_email; -- Extremely slow join",
+    "good": "SELECT u.name, c.company_name FROM users u INNER JOIN companies c ON u.company_id = c.id\nUNION\nSELECT u.name, c.company_name FROM users u INNER JOIN companies c ON u.email = c.domain_email; -- Optimizable index paths"
+  },
+  {
+    "id": 27,
+    "name": "Assuming NULL keys match in LEFT JOIN",
+    "explain": "Believing that a LEFT JOIN will automatically match rows where the join keys are NULL on both sides. NULLs are non-equal by definition.",
+    "bad": "SELECT e.name, d.name\nFROM employees e\nLEFT JOIN departments d ON e.department_id = d.id; -- Does NOT match employees with NULL department_id to departments with NULL IDs",
+    "good": "SELECT e.name, d.name\nFROM employees e\nLEFT JOIN departments d ON e.department_id = d.id OR (e.department_id IS NULL AND d.id IS NULL); -- Explicitly handles matching NULLs"
+  },
+  {
+    "id": 28,
+    "name": "Omitting join alias prefix in SELECT when selecting columns",
+    "explain": "Selecting columns without specifying the table alias when columns are unique *now* but could be duplicated in the future as database schemas evolve.",
+    "bad": "SELECT name, location\nFROM employees e\nINNER JOIN departments d ON e.department_id = d.id; -- Works now, but if 'location' is added to employees table later, query breaks!",
+    "good": "SELECT e.name, d.location\nFROM employees e\nINNER JOIN departments d ON e.department_id = d.id; -- Future-proof and safe"
+  },
+  {
+    "id": 29,
+    "name": "Joining on strings without trimming whitespace",
+    "explain": "Joining tables on text fields (like email or username) without stripping whitespace or matching case sensitiveness, leading to missed matches.",
+    "bad": "SELECT u.name, p.profile_pic\nFROM users u\nINNER JOIN profiles p ON u.email = p.email; -- Fails if user entered ' john@eg.com ' with spaces",
+    "good": "SELECT u.name, p.profile_pic\nFROM users u\nINNER JOIN profiles p ON TRIM(LOWER(u.email)) = TRIM(LOWER(p.email)); -- Standardized join match"
+  },
+  {
+    "id": 30,
+    "name": "Writing Nested Joins without parenthesis",
+    "explain": "Writing multi-table joins where the logical evaluation order is ambiguous, leading to unexpected results based on optimizer default parsing rules.",
+    "bad": "SELECT e.name, d.name, p.title\nFROM employees e\nLEFT JOIN departments d\nINNER JOIN projects p ON d.project_id = p.id ON e.department_id = d.id; -- Confusing syntax order",
+    "good": "SELECT e.name, d.name, p.title\nFROM employees e\nLEFT JOIN departments d ON e.department_id = d.id\nINNER JOIN projects p ON d.project_id = p.id; -- Sequential, readable structure"
+  }
+];
+    const DATA_PRACTICE = [
+  {
+    "id": 1,
+    "q": "Retrieve all employees and their department name. If an employee does not belong to any department, show their details with a NULL department.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT e.name AS employee_name, d.name AS department_name\nFROM employees e\nLEFT JOIN departments d ON e.department_id = d.id;",
+    "explain": "We need to preserve all rows from the Left table (employees), regardless of whether there is a corresponding row in the departments table. A LEFT JOIN is ideal here."
+  },
+  {
+    "id": 2,
+    "q": "Show only the employees who are actively assigned to a department. Exclude employees without a department and departments without employees.",
+    "join": "INNER JOIN",
+    "sql": "SELECT e.name AS employee_name, d.name AS department_name\nFROM employees e\nINNER JOIN departments d ON e.department_id = d.id;",
+    "explain": "We want the intersection: only rows where the employee has a department_id and there is a matching department. This requires an INNER JOIN."
+  },
+  {
+    "id": 3,
+    "q": "List all departments and the names of employees working in them. If a department has no employees, still display the department name.",
+    "join": "LEFT JOIN (or RIGHT JOIN)",
+    "sql": "SELECT d.name AS department_name, e.name AS employee_name\nFROM departments d\nLEFT JOIN employees e ON d.id = e.department_id;",
+    "explain": "To preserve all departments, we place 'departments' on the left and use a LEFT JOIN (or place it on the right and use a RIGHT JOIN)."
+  },
+  {
+    "id": 4,
+    "q": "Display a complete list of all employees and all departments. Include employees who don't have a department and departments that have no employees.",
+    "join": "FULL OUTER JOIN",
+    "sql": "SELECT e.name AS employee_name, d.name AS department_name\nFROM employees e\nFULL OUTER JOIN departments d ON e.department_id = d.id;",
+    "explain": "We must preserve all records from both tables. Rows that don't match on either side will be filled with NULLs. This requires a FULL OUTER JOIN."
+  },
+  {
+    "id": 5,
+    "q": "Generate a grid of all employees paired against every project in the system, so we can check all possible project assignments.",
+    "join": "CROSS JOIN",
+    "sql": "SELECT e.name AS employee_name, p.title AS project_title\nFROM employees e\nCROSS JOIN projects p;",
+    "explain": "We want a Cartesian product: every employee row combined with every project row, without any matching condition. This requires a CROSS JOIN."
+  },
+  {
+    "id": 6,
+    "q": "Find all employees along with the name of their manager. If an employee doesn't have a manager (e.g. the CEO), still display the employee.",
+    "join": "SELF JOIN (LEFT JOIN)",
+    "sql": "SELECT e.name AS employee_name, m.name AS manager_name\nFROM employees e\nLEFT JOIN employees m ON e.manager_id = m.id;",
+    "explain": "Since manager details are in the same employee table, we join the table to itself using aliases. A LEFT JOIN ensures employees without a manager are kept."
+  },
+  {
+    "id": 7,
+    "q": "Find employees who are earning the exact same salary as someone else in the company. Exclude matching an employee with themselves.",
+    "join": "SELF JOIN (INNER JOIN)",
+    "sql": "SELECT e1.name AS emp1, e2.name AS emp2, e1.salary\nFROM employees e1\nINNER JOIN employees e2 ON e1.salary = e2.salary AND e1.id < e2.id;",
+    "explain": "We join the employee table to itself on matching salaries. Using 'e1.id < e2.id' avoids self-matching and filters out duplicate pairs (A-B and B-A)."
+  },
+  {
+    "id": 8,
+    "q": "List all customers and the dates of their orders. Include customers who have never placed an order.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT c.name AS customer_name, o.order_date\nFROM customers c\nLEFT JOIN orders o ON c.id = o.customer_id;",
+    "explain": "All customers must be preserved. Customers with no orders will have a NULL order_date, indicating a LEFT JOIN."
+  },
+  {
+    "id": 9,
+    "q": "Find only the customers who have placed at least one order, returning their name and the order ID.",
+    "join": "INNER JOIN",
+    "sql": "SELECT c.name AS customer_name, o.id AS order_id\nFROM customers c\nINNER JOIN orders o ON c.id = o.customer_id;",
+    "explain": "Only matching customer-order pairs are needed. Customers with no orders are omitted. This requires an INNER JOIN."
+  },
+  {
+    "id": 10,
+    "q": "List all orders along with the customer email. Include orders that might not be linked to a registered customer account (e.g., guest checkouts).",
+    "join": "LEFT JOIN (or RIGHT JOIN)",
+    "sql": "SELECT o.id AS order_id, c.email AS customer_email\nFROM orders o\nLEFT JOIN customers c ON o.customer_id = c.id;",
+    "explain": "We want to preserve all orders, regardless of customer existence. Placing orders on the left and using a LEFT JOIN is correct."
+  },
+  {
+    "id": 11,
+    "q": "List all students and the classes they are enrolled in. Exclude students who are not registered for any classes and empty classes.",
+    "join": "INNER JOIN",
+    "sql": "SELECT s.name AS student_name, c.title AS course_title\nFROM students s\nINNER JOIN enrollments e ON s.id = e.student_id\nINNER JOIN courses c ON e.course_id = c.id;",
+    "explain": "This is a three-table join. Since we want only active student-course pairings, we use INNER JOINs across all connections."
+  },
+  {
+    "id": 12,
+    "q": "List all students and any classes they have enrolled in. Include students who have not registered for any classes.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT s.name AS student_name, c.title AS course_title\nFROM students s\nLEFT JOIN enrollments e ON s.id = e.student_id\nLEFT JOIN courses c ON e.course_id = c.id;",
+    "explain": "We must preserve all students. We LEFT JOIN enrollments, and then LEFT JOIN courses to keep the student records intact even if they have 0 registrations."
+  },
+  {
+    "id": 13,
+    "q": "Show all courses and the students enrolled in them. Include courses that currently have zero students registered.",
+    "join": "LEFT JOIN (or RIGHT JOIN)",
+    "sql": "SELECT c.title AS course_title, s.name AS student_name\nFROM courses c\nLEFT JOIN enrollments e ON c.id = e.course_id\nLEFT JOIN students s ON e.student_id = s.id;",
+    "explain": "To preserve all courses (even empty ones), courses must be the primary (leftmost) table in a chain of LEFT JOINs."
+  },
+  {
+    "id": 14,
+    "q": "List all authors and the titles of books they've written. If an author hasn't written any books, show their name with NULL as the title.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT a.name AS author_name, b.title AS book_title\nFROM authors a\nLEFT JOIN books b ON a.id = b.author_id;",
+    "explain": "Preserves all authors. Authors without matching books in the books table will show NULL for the book title."
+  },
+  {
+    "id": 15,
+    "q": "List all books and their publisher's name. Include books that do not have a publisher assigned yet.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT b.title AS book_title, p.name AS publisher_name\nFROM books b\nLEFT JOIN publishers p ON b.publisher_id = p.id;",
+    "explain": "We want to preserve all books, even if they lack a publisher. Place books on the left and use a LEFT JOIN."
+  },
+  {
+    "id": 16,
+    "q": "Retrieve all publishers and their books. Include publishers who haven't published any books yet.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT p.name AS publisher_name, b.title AS book_title\nFROM publishers p\nLEFT JOIN books b ON p.id = b.publisher_id;",
+    "explain": "All publishers must be preserved. Therefore, publishers is the Left table joined to books using a LEFT JOIN."
+  },
+  {
+    "q": "Match authors and publishers where they reside in the same city. Only return matches.",
+    "join": "INNER JOIN",
+    "sql": "SELECT a.name AS author_name, p.name AS publisher_name, a.city\nFROM authors a\nINNER JOIN publishers p ON a.city = p.city;",
+    "id": 17,
+    "explain": "A standard inner join that matches authors to publishers on the condition of sharing the same city."
+  },
+  {
+    "id": 18,
+    "q": "Show all flights and their arrival airport codes. Include flights that have not landed (arrival airport is NULL/unassigned).",
+    "join": "LEFT JOIN",
+    "sql": "SELECT f.flight_number, a.code AS airport_code\nFROM flights f\nLEFT JOIN airports a ON f.arrival_airport_id = a.id;",
+    "explain": "Flights is the primary table that needs preservation. Unlanded flights will have a NULL airport code, hence a LEFT JOIN."
+  },
+  {
+    "id": 19,
+    "q": "List all airports and the flight numbers landing there. Include airports that currently have no incoming flights.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT a.name AS airport_name, f.flight_number\nFROM airports a\nLEFT JOIN flights f ON a.id = f.arrival_airport_id;",
+    "explain": "We preserve all airports, making it the Left table. We LEFT JOIN flights to ensure airports with no flights are displayed."
+  },
+  {
+    "id": 20,
+    "q": "Show all flight schedules and passenger names, including empty flights and passengers who haven't booked any flights.",
+    "join": "FULL OUTER JOIN",
+    "sql": "SELECT f.flight_number, p.name AS passenger_name\nFROM bookings b\nFULL OUTER JOIN flights f ON b.flight_id = f.id\nFULL OUTER JOIN passengers p ON b.passenger_id = p.id;",
+    "explain": "Both flights (possibly empty) and passengers (possibly without bookings) must be preserved. We use a FULL OUTER JOIN chain."
+  },
+  {
+    "id": 21,
+    "q": "Find all doctor-patient pairs that have a matching appointment. Omit doctors with no patients and patients with no appointments.",
+    "join": "INNER JOIN",
+    "sql": "SELECT d.name AS doctor_name, p.name AS patient_name\nFROM appointments a\nINNER JOIN doctors d ON a.doctor_id = d.id\nINNER JOIN patients p ON a.patient_id = p.id;",
+    "explain": "We only want active appointments. Therefore, we use INNER JOINs to link appointments to doctors and patients."
+  },
+  {
+    "id": 22,
+    "q": "Show all doctors and their patient appointments, including doctors who have not scheduled any appointments.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT d.name AS doctor_name, a.appointment_date, p.name AS patient_name\nFROM doctors d\nLEFT JOIN appointments a ON d.id = a.doctor_id\nLEFT JOIN patients p ON a.patient_id = p.id;",
+    "explain": "Doctors is the primary table. We LEFT JOIN appointments and patients to preserve doctors with zero appointments."
+  },
+  {
+    "id": 23,
+    "q": "Show all patients and their scheduled doctors, including patients who have not booked any appointments.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT p.name AS patient_name, d.name AS doctor_name\nFROM patients p\nLEFT JOIN appointments a ON p.id = a.patient_id\nLEFT JOIN doctors d ON a.doctor_id = d.id;",
+    "explain": "Patients must be preserved. We start with patients on the left and LEFT JOIN appointments and doctors."
+  },
+  {
+    "id": 24,
+    "q": "List all products and their categories. If a product does not belong to a category, show NULL for the category name.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT p.name AS product_name, c.name AS category_name\nFROM products p\nLEFT JOIN categories c ON p.category_id = c.id;",
+    "explain": "Preserves all products. Uncategorized products will display NULL for category_name."
+  },
+  {
+    "id": 25,
+    "q": "Find categories that have products. Exclude empty categories and uncategorized products.",
+    "join": "INNER JOIN",
+    "sql": "SELECT c.name AS category_name, p.name AS product_name\nFROM categories c\nINNER JOIN products p ON c.id = p.category_id;",
+    "explain": "Strict matching between categories and products. Standard INNER JOIN."
+  },
+  {
+    "id": 26,
+    "q": "List all categories, and display the products in them. Include empty categories.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT c.name AS category_name, p.name AS product_name\nFROM categories c\nLEFT JOIN products p ON c.id = p.category_id;",
+    "explain": "Categories must be preserved, even if they contain no products. Place categories on the left of a LEFT JOIN."
+  },
+  {
+    "id": 27,
+    "q": "Produce a combined list of all products and all categories, showing unmatched products and empty categories together.",
+    "join": "FULL OUTER JOIN",
+    "sql": "SELECT p.name AS product_name, c.name AS category_name\nFROM products p\nFULL OUTER JOIN categories c ON p.category_id = c.id;",
+    "explain": "Preserves both tables entirely. Product without categories and categories with no products are kept. Requires a FULL OUTER JOIN."
+  },
+  {
+    "id": 28,
+    "q": "Generate a combinations list of every product in the catalog with every store location.",
+    "join": "CROSS JOIN",
+    "sql": "SELECT p.name AS product_name, s.city AS store_location\nFROM products p\nCROSS JOIN stores s;",
+    "explain": "We need the Cartesian product of products and stores. A CROSS JOIN generates all possible pairs."
+  },
+  {
+    "id": 29,
+    "q": "Find pairs of products in the same category that have the exact same price.",
+    "join": "SELF JOIN",
+    "sql": "SELECT p1.name AS prod1, p2.name AS prod2, p1.price\nFROM products p1\nINNER JOIN products p2 ON p1.category_id = p2.category_id AND p1.price = p2.price AND p1.id < p2.id;",
+    "explain": "A self join matches the products table with itself on category_id and price, excluding self-matches with '<' ID filter."
+  },
+  {
+    "id": 30,
+    "q": "Find all users and their uploaded documents. Include users who have uploaded nothing.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT u.username, d.filename\nFROM users u\nLEFT JOIN documents d ON u.id = d.user_id;",
+    "explain": "Keep all users (Left table) regardless of whether they have uploaded files. Uses a LEFT JOIN."
+  },
+  {
+    "id": 31,
+    "q": "Show only users who have uploaded documents, along with the document filenames.",
+    "join": "INNER JOIN",
+    "sql": "SELECT u.username, d.filename\nFROM users u\nINNER JOIN documents d ON u.id = d.user_id;",
+    "explain": "We only want the intersection of users and documents (exclude document-less users). This is an INNER JOIN."
+  },
+  {
+    "id": 32,
+    "q": "Retrieve all documents in the system and their uploader username. Include documents that are orphaned (have no valid user_id link).",
+    "join": "LEFT JOIN (or RIGHT JOIN)",
+    "sql": "SELECT d.filename, u.username\nFROM documents d\nLEFT JOIN users u ON d.user_id = u.id;",
+    "explain": "Preserve all documents. Place documents on the left and use a LEFT JOIN to link users."
+  },
+  {
+    "id": 33,
+    "q": "Show all projects and the employees assigned to them. Exclude unassigned projects and employee-less projects.",
+    "join": "INNER JOIN",
+    "sql": "SELECT p.title AS project_title, e.name AS employee_name\nFROM projects p\nINNER JOIN employee_projects ep ON p.id = ep.project_id\nINNER JOIN employees e ON ep.employee_id = e.id;",
+    "explain": "Only return active assignments by joining projects to employees via junction table using INNER JOINs."
+  },
+  {
+    "id": 34,
+    "q": "Show all projects and any employees assigned to them. Include projects with no employees assigned.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT p.title AS project_title, e.name AS employee_name\nFROM projects p\nLEFT JOIN employee_projects ep ON p.id = ep.project_id\nLEFT JOIN employees e ON ep.employee_id = e.id;",
+    "explain": "Preserves all projects. We LEFT JOIN the association table and the employee table to keep empty projects."
+  },
+  {
+    "id": 35,
+    "q": "Retrieve all employees and their assigned projects. Include employees who are currently not assigned to any projects.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT e.name AS employee_name, p.title AS project_title\nFROM employees e\nLEFT JOIN employee_projects ep ON e.id = ep.employee_id\nLEFT JOIN projects p ON ep.project_id = p.id;",
+    "explain": "Preserves all employees. We LEFT JOIN the junction table and project table to keep unassigned employees."
+  },
+  {
+    "id": 36,
+    "q": "List all suppliers and the parts they supply. Include suppliers who do not supply any parts.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT s.name AS supplier_name, p.part_name\nFROM suppliers s\nLEFT JOIN parts p ON s.id = p.supplier_id;",
+    "explain": "Keep all suppliers (Left table), showing NULL part names for suppliers with no catalog parts. Requires a LEFT JOIN."
+  },
+  {
+    "id": 37,
+    "q": "Show parts that have a supplier. Omit parts without an assigned supplier.",
+    "join": "INNER JOIN",
+    "sql": "SELECT p.part_name, s.name AS supplier_name\nFROM parts p\nINNER JOIN suppliers s ON p.supplier_id = s.id;",
+    "explain": "Match parts to suppliers; exclude orphaned parts. Requires a standard INNER JOIN."
+  },
+  {
+    "id": 38,
+    "q": "List all departments and their offices. Include offices that do not host any departments.",
+    "join": "RIGHT JOIN (or LEFT JOIN with table swap)",
+    "sql": "SELECT d.name AS department_name, o.office_number\nFROM departments d\nRIGHT JOIN offices o ON d.office_id = o.id;",
+    "explain": "We need to preserve all offices. Placing offices on the right and using a RIGHT JOIN (or swapping and using LEFT JOIN) accomplishes this."
+  },
+  {
+    "id": 39,
+    "q": "Match students and advisors who share the exact same first name. Return only matches.",
+    "join": "INNER JOIN",
+    "sql": "SELECT s.name AS student, a.name AS advisor\nFROM students s\nINNER JOIN advisors a ON s.first_name = a.first_name;",
+    "explain": "A standard inner join that matches students to advisors on the text condition of first name equality."
+  },
+  {
+    "id": 40,
+    "q": "Compare student enrollment counts. Generate all possible pairs of courses to evaluate overlaps.",
+    "join": "CROSS JOIN",
+    "sql": "SELECT c1.title AS course1, c2.title AS course2\nFROM courses c1\nCROSS JOIN courses c2\nWHERE c1.id < c2.id;",
+    "explain": "A cross join combines all courses. The WHERE condition filters out duplicate matching and matching a course with itself."
+  },
+  {
+    "id": 41,
+    "q": "List all blog posts and their comments. Include posts that have zero comments.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT p.title, c.comment_text\nFROM posts p\nLEFT JOIN comments c ON p.id = c.post_id;",
+    "explain": "Posts must be preserved. Comment-less posts will show NULL for comment text. This is a LEFT JOIN."
+  },
+  {
+    "id": 42,
+    "q": "Show posts that have comments. Exclude posts with no comments.",
+    "join": "INNER JOIN",
+    "sql": "SELECT p.title, c.comment_text\nFROM posts p\nINNER JOIN comments c ON p.id = c.post_id;",
+    "explain": "Strict match. Exclude post rows with no comments. Requires an INNER JOIN."
+  },
+  {
+    "id": 43,
+    "q": "Show all comments and the posts they belong to. Include comments that are not associated with a post.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT c.comment_text, p.title\nFROM comments c\nLEFT JOIN posts p ON c.post_id = p.id;",
+    "explain": "Preserves all comments. Omitted post references will show NULL for post titles. Requires a LEFT JOIN."
+  },
+  {
+    "id": 44,
+    "q": "List all authors and all articles they have co-authored. Include articles with no authors and authors with no articles.",
+    "join": "FULL OUTER JOIN",
+    "sql": "SELECT a.name, art.title\nFROM authors a\nFULL OUTER JOIN articles art ON a.article_id = art.id;",
+    "explain": "Preserves both tables entirely, making FULL OUTER JOIN the required option."
+  },
+  {
+    "id": 45,
+    "q": "Find all tasks in a project. If a task has a prerequisite task, show the prerequisite task title. Include tasks without prerequisites.",
+    "join": "SELF JOIN (LEFT JOIN)",
+    "sql": "SELECT t.title AS task_title, pre.title AS prerequisite_title\nFROM tasks t\nLEFT JOIN tasks pre ON t.prereq_id = pre.id;",
+    "explain": "Since prerequisite details are within the tasks table, we join the table to itself on prereq_id = id. LEFT JOIN keeps tasks with no prerequisites."
+  },
+  {
+    "id": 46,
+    "q": "Find employees and their managers. Exclude employees who don't have a manager.",
+    "join": "SELF JOIN (INNER JOIN)",
+    "sql": "SELECT e.name AS employee_name, m.name AS manager_name\nFROM employees e\nINNER JOIN employees m ON e.manager_id = m.id;",
+    "explain": "Self-join on employee-manager hierarchy. INNER JOIN filters out employees (like the CEO) who have no manager."
+  },
+  {
+    "id": 47,
+    "q": "Generate all possible pairs of team members to form 2-person project teams.",
+    "join": "SELF JOIN (CROSS / INNER JOIN)",
+    "sql": "SELECT m1.name AS member1, m2.name AS member2\nFROM members m1\nINNER JOIN members m2 ON m1.id < m2.id;",
+    "explain": "A self join with ID comparison generates unique pairings of team members without repeats."
+  },
+  {
+    "id": 48,
+    "q": "List all books and their translations. Include books that have not been translated.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT b.title, t.language, t.translated_title\nFROM books b\nLEFT JOIN translations t ON b.id = t.book_id;",
+    "explain": "All books are preserved. Books with no translation rows will show NULL for translation fields. Requires a LEFT JOIN."
+  },
+  {
+    "id": 49,
+    "q": "Show books that have translations. Omit untranslated books.",
+    "join": "INNER JOIN",
+    "sql": "SELECT b.title, t.language, t.translated_title\nFROM books b\nINNER JOIN translations t ON b.id = t.book_id;",
+    "explain": "Only return records that have matching rows in both books and translations. Requires an INNER JOIN."
+  },
+  {
+    "id": 50,
+    "q": "List all transaction accounts and their branches. Include branches without any registered accounts.",
+    "join": "RIGHT JOIN (or LEFT JOIN with table swap)",
+    "sql": "SELECT a.account_number, b.name AS branch_name\nFROM accounts a\nRIGHT JOIN branches b ON a.branch_id = b.id;",
+    "explain": "Branches must be preserved. We use a RIGHT JOIN if branches is on the right, or a LEFT JOIN if we put branches on the left."
+  },
+  {
+    "id": 51,
+    "q": "List all students and advisors. Display matches where possible. Include unassigned students and advisors with no assigned students.",
+    "join": "FULL OUTER JOIN",
+    "sql": "SELECT s.name AS student_name, a.name AS advisor_name\nFROM students s\nFULL OUTER JOIN advisors a ON s.advisor_id = a.id;",
+    "explain": "Requires preservation of both tables (unassigned students and advisors with no students). FULL OUTER JOIN is the correct choice."
+  },
+  {
+    "id": 52,
+    "q": "Find all products that have the exact same weight. Exclude matching a product with itself.",
+    "join": "SELF JOIN",
+    "sql": "SELECT p1.name AS prod1, p2.name AS prod2, p1.weight\nFROM products p1\nINNER JOIN products p2 ON p1.weight = p2.weight AND p1.id < p2.id;",
+    "explain": "Self-join on weight. Using < operator prevents duplicate combinations and matching a product to itself."
+  },
+  {
+    "id": 53,
+    "q": "Create a list of all possible flight itineraries connecting our departure and arrival airports directly.",
+    "join": "CROSS JOIN",
+    "sql": "SELECT a1.code AS departure, a2.code AS arrival\nFROM airports a1\nCROSS JOIN airports a2\nWHERE a1.id <> a2.id;",
+    "explain": "A CROSS JOIN generates all possible departure-arrival combinations. The inequality filters out same-airport flights."
+  },
+  {
+    "id": 54,
+    "q": "Retrieve all customer details along with their discount coupon code. Include customers who do not have a coupon.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT c.name, co.code\nFROM customers c\nLEFT JOIN coupons co ON c.coupon_id = co.id;",
+    "explain": "Preserves all customers. Customers with no discount coupon will show NULL. This is a LEFT JOIN."
+  },
+  {
+    "id": 55,
+    "q": "Find customers who have used a discount coupon. Exclude customers without coupons.",
+    "join": "INNER JOIN",
+    "sql": "SELECT c.name, co.code\nFROM customers c\nINNER JOIN coupons co ON c.coupon_id = co.id;",
+    "explain": "Intersection: only returns customers who hold a valid matching coupon. Requires an INNER JOIN."
+  },
+  {
+    "id": 56,
+    "q": "List all discount coupons and the customers who have redeemed them. Include coupons that have not been redeemed yet.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT co.code, c.name\nFROM coupons co\nLEFT JOIN customers c ON co.id = c.coupon_id;",
+    "explain": "Preserves all coupons. Unredeemed coupons will show NULL for customer name. Requires a LEFT JOIN with coupons as the primary table."
+  },
+  {
+    "id": 57,
+    "q": "Show all users and their profile badges. Include users with no badges and badges that haven't been earned by anyone.",
+    "join": "FULL OUTER JOIN",
+    "sql": "SELECT u.name, b.title AS badge_title\nFROM users u\nFULL OUTER JOIN user_badges ub ON u.id = ub.user_id\nFULL OUTER JOIN badges b ON ub.badge_id = b.id;",
+    "explain": "All users (with or without badges) and all badges (earned or not) must be preserved. Requires FULL OUTER JOINs."
+  },
+  {
+    "id": 58,
+    "q": "Find orders and their items. Exclude orders that contain no items (empty orders) and items not linked to an order.",
+    "join": "INNER JOIN",
+    "sql": "SELECT o.id AS order_id, i.name AS item_name\nFROM orders o\nINNER JOIN order_items oi ON o.id = oi.order_id\nINNER JOIN items i ON oi.item_id = i.id;",
+    "explain": "Standard inner join matching order header to line items to item definitions. Discards unmatched entries."
+  },
+  {
+    "id": 59,
+    "q": "Show all orders and their items. Include orders that have no items listed in the database.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT o.id AS order_id, i.name AS item_name\nFROM orders o\nLEFT JOIN order_items oi ON o.id = oi.order_id\nLEFT JOIN items i ON oi.item_id = i.id;",
+    "explain": "Keep all orders. Left join to order items and item descriptions to ensure empty orders remain in the result."
+  },
+  {
+    "id": 60,
+    "q": "Retrieve all items in inventory and the order IDs they appear in. Include items that have never been ordered.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT i.name AS item_name, oi.order_id\nFROM items i\nLEFT JOIN order_items oi ON i.id = oi.item_id;",
+    "explain": "Preserves all inventory items. Items with no sales history show NULL order IDs, requiring a LEFT JOIN."
+  },
+  {
+    "id": 61,
+    "q": "List all events and their venues. Include events without a venue assigned yet.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT e.title, v.name AS venue_name\nFROM events e\nLEFT JOIN venues v ON e.venue_id = v.id;",
+    "explain": "Keeps all events. Unassigned venues show as NULL. This requires a LEFT JOIN."
+  },
+  {
+    "id": 62,
+    "q": "List all venues and the events hosted in them. Include venues that have no events scheduled.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT v.name AS venue_name, e.title\nFROM venues v\nLEFT JOIN events e ON v.id = e.venue_id;",
+    "explain": "Keeps all venues. Venues with zero events will have NULL event titles. Requires a LEFT JOIN starting with venues."
+  },
+  {
+    "id": 63,
+    "q": "List all events and all venues, displaying matches where possible. Include events without venues and venues with no events.",
+    "join": "FULL OUTER JOIN",
+    "sql": "SELECT e.title, v.name AS venue_name\nFROM events e\nFULL OUTER JOIN venues v ON e.venue_id = v.id;",
+    "explain": "Requires complete preservation of both events and venues, which is the definition of a FULL OUTER JOIN."
+  },
+  {
+    "id": 64,
+    "q": "Show only events that have a venue assigned, along with the venue name.",
+    "join": "INNER JOIN",
+    "sql": "SELECT e.title, v.name AS venue_name\nFROM events e\nINNER JOIN venues v ON e.venue_id = v.id;",
+    "explain": "Only return events that have a valid match in the venues table. Requires an INNER JOIN."
+  },
+  {
+    "id": 65,
+    "q": "Find all users who reside in the same state. Exclude matching a user to themselves.",
+    "join": "SELF JOIN",
+    "sql": "SELECT u1.name AS user1, u2.name AS user2, u1.state\nFROM users u1\nINNER JOIN users u2 ON u1.state = u2.state AND u1.id < u2.id;",
+    "explain": "Self-join on state. The ID comparison avoids self-matching and lists each unique pair once."
+  },
+  {
+    "id": 66,
+    "q": "List all employees and their work office. Include offices that are empty.",
+    "join": "RIGHT JOIN (or LEFT JOIN with table swap)",
+    "sql": "SELECT e.name, o.office_name\nFROM employees e\nRIGHT JOIN offices o ON e.office_id = o.id;",
+    "explain": "Offices must be preserved. Using RIGHT JOIN preserves the right table (offices)."
+  },
+  {
+    "id": 67,
+    "q": "Show all assets and their users. Include assets with no user and users with no assets.",
+    "join": "FULL OUTER JOIN",
+    "sql": "SELECT a.asset_name, u.name\nFROM assets a\nFULL OUTER JOIN users u ON a.user_id = u.id;",
+    "explain": "Preserves both assets and users fully, which requires a FULL OUTER JOIN."
+  },
+  {
+    "id": 68,
+    "q": "List all tasks and the employees assigned. Include tasks that are unassigned.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT t.task_name, e.name\nFROM tasks t\nLEFT JOIN employees e ON t.assigned_to = e.id;",
+    "explain": "Preserves all tasks. Unassigned tasks will show NULL for employee name. Requires a LEFT JOIN."
+  },
+  {
+    "id": 69,
+    "q": "Find tasks that have been assigned. Exclude tasks without an assigned employee.",
+    "join": "INNER JOIN",
+    "sql": "SELECT t.task_name, e.name\nFROM tasks t\nINNER JOIN employees e ON t.assigned_to = e.id;",
+    "explain": "Only show matching tasks and employees. Unassigned tasks are excluded. Requires an INNER JOIN."
+  },
+  {
+    "id": 70,
+    "q": "Retrieve all employees and their tasks. Include employees who have no tasks assigned to them.",
+    "join": "LEFT JOIN (or RIGHT JOIN)",
+    "sql": "SELECT e.name, t.task_name\nFROM employees e\nLEFT JOIN tasks t ON e.id = t.assigned_to;",
+    "explain": "Preserves all employees. Employees with no tasks show NULL for task_name. Requires a LEFT JOIN starting with employees."
+  },
+  {
+    "id": 71,
+    "q": "List all movies and their reviews. Include movies that have not received any reviews.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT m.title, r.rating, r.comment\nFROM movies m\nLEFT JOIN reviews r ON m.id = r.movie_id;",
+    "explain": "Movies must be preserved. Review fields for unreviewed movies will show NULL, indicating a LEFT JOIN."
+  },
+  {
+    "id": 72,
+    "q": "Show only movies that have reviews, along with the reviews.",
+    "join": "INNER JOIN",
+    "sql": "SELECT m.title, r.rating, r.comment\nFROM movies m\nINNER JOIN reviews r ON m.id = r.movie_id;",
+    "explain": "Only return movies that have corresponding records in the reviews table. Requires an INNER JOIN."
+  },
+  {
+    "id": 73,
+    "q": "List all reviews and the movies they belong to. Include orphaned reviews that don't match any movie in the database.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT r.comment, m.title\nFROM reviews r\nLEFT JOIN movies m ON r.movie_id = m.id;",
+    "explain": "All reviews must be preserved. Orphaned reviews will show NULL for movie title. Requires a LEFT JOIN starting with reviews."
+  },
+  {
+    "id": 74,
+    "q": "Show all movies and all reviews, displaying mismatches on both sides.",
+    "join": "FULL OUTER JOIN",
+    "sql": "SELECT m.title, r.comment\nFROM movies m\nFULL OUTER JOIN reviews r ON m.id = r.movie_id;",
+    "explain": "Preserves all movies (even unreviewed) and all reviews (even orphaned). Requires a FULL OUTER JOIN."
+  },
+  {
+    "id": 75,
+    "q": "Generate all possible pairs of movies to create a side-by-side comparison poll.",
+    "join": "CROSS JOIN",
+    "sql": "SELECT m1.title AS movie1, m2.title AS movie2\nFROM movies m1\nCROSS JOIN movies m2\nWHERE m1.id < m2.id;",
+    "explain": "CROSS JOIN yields all movie pairings. The filter eliminates matching a movie to itself and duplicates."
+  },
+  {
+    "id": 76,
+    "q": "Find movies in the database released in the same year. Exclude matching a movie to itself.",
+    "join": "SELF JOIN",
+    "sql": "SELECT m1.title AS movie1, m2.title AS movie2, m1.release_year\nFROM movies m1\nINNER JOIN movies m2 ON m1.release_year = m2.release_year AND m1.id < m2.id;",
+    "explain": "Self-join on release_year. Filters eliminate self-matching and duplicate comparisons."
+  },
+  {
+    "id": 77,
+    "q": "List all customers and their credit cards. Include customers who do not have a credit card.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT c.name, cc.card_number\nFROM customers c\nLEFT JOIN credit_cards cc ON c.id = cc.customer_id;",
+    "explain": "Preserves all customers. Card details for card-less customers show as NULL. Requires a LEFT JOIN."
+  },
+  {
+    "id": 78,
+    "q": "Show only customers who have registered credit cards.",
+    "join": "INNER JOIN",
+    "sql": "SELECT c.name, cc.card_number\nFROM customers c\nINNER JOIN credit_cards cc ON c.id = cc.customer_id;",
+    "explain": "Returns only customers with matching cards. Requires an INNER JOIN."
+  },
+  {
+    "id": 79,
+    "q": "List all credit cards in the system, along with their owner's name. Include cards without a registered customer.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT cc.card_number, c.name\nFROM credit_cards cc\nLEFT JOIN customers c ON cc.customer_id = c.id;",
+    "explain": "Preserves all credit cards. Place credit cards on the left of a LEFT JOIN."
+  },
+  {
+    "id": 80,
+    "q": "Show all customers and all credit cards, including unmatched records on both sides.",
+    "join": "FULL OUTER JOIN",
+    "sql": "SELECT c.name, cc.card_number\nFROM customers c\nFULL OUTER JOIN credit_cards cc ON c.id = cc.customer_id;",
+    "explain": "Preserves both tables entirely, requiring a FULL OUTER JOIN."
+  },
+  {
+    "id": 81,
+    "q": "Match students and courses on the condition that they are in the same department. Return all student-course pairs.",
+    "join": "INNER JOIN",
+    "sql": "SELECT s.name AS student, c.title AS course\nFROM students s\nINNER JOIN courses c ON s.department_id = c.department_id;",
+    "explain": "Standard inner join matching on shared department code. Returns only active matches."
+  },
+  {
+    "id": 82,
+    "q": "Generate all possible course-student combinations for an enrollment survey.",
+    "join": "CROSS JOIN",
+    "sql": "SELECT s.name, c.title\nFROM students s\nCROSS JOIN courses c;",
+    "explain": "A CROSS JOIN yields the complete Cartesian product of students and courses."
+  },
+  {
+    "id": 83,
+    "q": "List all student records, along with their exam grades. Include students who missed exams.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT s.name, g.grade\nFROM students s\nLEFT JOIN grades g ON s.id = g.student_id;",
+    "explain": "Preserves all students. Grade fields for missing exams show as NULL. Requires a LEFT JOIN."
+  },
+  {
+    "id": 84,
+    "q": "Show only student records that have registered exam grades.",
+    "join": "INNER JOIN",
+    "sql": "SELECT s.name, g.grade\nFROM students s\nINNER JOIN grades g ON s.id = g.student_id;",
+    "explain": "Omit students without grades. Requires a standard INNER JOIN."
+  },
+  {
+    "id": 85,
+    "q": "List all exam grades and the students they belong to. Include grades that have no matching student name in the system.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT g.grade, s.name\nFROM grades g\nLEFT JOIN students s ON g.student_id = s.id;",
+    "explain": "Preserves all grades. Place grades on the left of a LEFT JOIN."
+  },
+  {
+    "id": 86,
+    "q": "Show all students and all exam grades, displaying unmatched students and orphaned grades.",
+    "join": "FULL OUTER JOIN",
+    "sql": "SELECT s.name, g.grade\nFROM students s\nFULL OUTER JOIN grades g ON s.id = g.student_id;",
+    "explain": "Preserves both tables fully, requiring a FULL OUTER JOIN."
+  },
+  {
+    "id": 87,
+    "q": "Find students who scored the exact same grade in a course. Exclude matching a student with themselves.",
+    "join": "SELF JOIN",
+    "sql": "SELECT g1.student_id AS stud1, g2.student_id AS stud2, g1.grade\nFROM grades g1\nINNER JOIN grades g2 ON g1.course_id = g2.course_id AND g1.grade = g2.grade AND g1.student_id < g2.student_id;",
+    "explain": "Self-join on course_id and grade. The ID filter filters out self-matching and duplicate records."
+  },
+  {
+    "id": 88,
+    "q": "List all posts and their authors. Include posts written by deleted authors (author is NULL).",
+    "join": "LEFT JOIN",
+    "sql": "SELECT p.title, u.username\nFROM posts p\nLEFT JOIN users u ON p.author_id = u.id;",
+    "explain": "Preserves all posts, making it a LEFT JOIN starting with posts."
+  },
+  {
+    "id": 89,
+    "q": "List all authors and the posts they have written. Include authors who have never written a post.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT u.username, p.title\nFROM users u\nLEFT JOIN posts p ON u.id = p.author_id;",
+    "explain": "Preserves all users/authors, making it a LEFT JOIN starting with users."
+  },
+  {
+    "id": 90,
+    "q": "Show all users and all posts, including posts with no author and authors with no posts.",
+    "join": "FULL OUTER JOIN",
+    "sql": "SELECT u.username, p.title\nFROM users u\nFULL OUTER JOIN posts p ON u.id = p.author_id;",
+    "explain": "Preserves both tables fully, requiring a FULL OUTER JOIN."
+  },
+  {
+    "id": 91,
+    "q": "Find posts and their authors, excluding posts with no author and authors with no posts.",
+    "join": "INNER JOIN",
+    "sql": "SELECT p.title, u.username\nFROM posts p\nINNER JOIN users u ON p.author_id = u.id;",
+    "explain": "Only return strict matches, requiring a standard INNER JOIN."
+  },
+  {
+    "id": 92,
+    "q": "Generate all possible author-post pairings for a user review list.",
+    "join": "CROSS JOIN",
+    "sql": "SELECT u.username, p.title\nFROM users u\nCROSS JOIN posts p;",
+    "explain": "Requires the complete Cartesian product, which is generated via CROSS JOIN."
+  },
+  {
+    "id": 93,
+    "q": "Find duplicate users who signed up using the same email address.",
+    "join": "SELF JOIN",
+    "sql": "SELECT u1.name AS user1, u2.name AS user2, u1.email\nFROM users u1\nINNER JOIN users u2 ON u1.email = u2.email AND u1.id < u2.id;",
+    "explain": "Self-join on email. The ID filter handles self-match exclusions."
+  },
+  {
+    "id": 94,
+    "q": "List all divisions and their stores. Include empty divisions with no stores.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT d.division_name, s.store_name\nFROM divisions d\nLEFT JOIN stores s ON d.id = s.division_id;",
+    "explain": "Keeps all divisions. Division table is on the left of a LEFT JOIN."
+  },
+  {
+    "id": 95,
+    "q": "List all stores and their divisions. Include stores that are not assigned to a division.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT s.store_name, d.division_name\nFROM stores s\nLEFT JOIN divisions d ON s.division_id = d.id;",
+    "explain": "Keeps all stores. Store table is on the left of a LEFT JOIN."
+  },
+  {
+    "id": 96,
+    "q": "Show all divisions and all stores, displaying unmatched divisions and stores together.",
+    "join": "FULL OUTER JOIN",
+    "sql": "SELECT d.division_name, s.store_name\nFROM divisions d\nFULL OUTER JOIN stores s ON d.id = s.division_id;",
+    "explain": "Preserves both tables fully, requiring a FULL OUTER JOIN."
+  },
+  {
+    "id": 97,
+    "q": "Find only stores that belong to a division.",
+    "join": "INNER JOIN",
+    "sql": "SELECT s.store_name, d.division_name\nFROM stores s\nINNER JOIN divisions d ON s.division_id = d.id;",
+    "explain": "Strict matching between stores and divisions. Requires a standard INNER JOIN."
+  },
+  {
+    "id": 98,
+    "q": "Generate all possible pairs of stores to run comparative sales checks.",
+    "join": "CROSS JOIN",
+    "sql": "SELECT s1.store_name AS store1, s2.store_name AS store2\nFROM stores s1\nCROSS JOIN stores s2\nWHERE s1.id < s2.id;",
+    "explain": "CROSS JOIN generates all store combinations. Filter removes self-pairing and duplicates."
+  },
+  {
+    "id": 99,
+    "q": "Find stores located in the same city. Exclude matching a store to itself.",
+    "join": "SELF JOIN",
+    "sql": "SELECT s1.store_name AS store1, s2.store_name AS store2, s1.city\nFROM stores s1\nINNER JOIN stores s2 ON s1.city = s2.city AND s1.id < s2.id;",
+    "explain": "Self-join on city. Filters eliminate self-matching and duplicate comparisons."
+  },
+  {
+    "id": 100,
+    "q": "List all transactions and their payment methods. If a payment method is missing, still display the transaction details.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT t.id AS transaction_id, pm.method_name\nFROM transactions t\nLEFT JOIN payment_methods pm ON t.method_id = pm.id;",
+    "explain": "All transactions must be preserved. Transactions with missing/unmatched payment methods will show NULL, requiring a LEFT JOIN."
+  }
+];
+
+    // Local UI States
+    let currentVennRegions = { left: false, matching: false, right: false };
+    let practiceFilter = 'all';
+    let practiceSearchQuery = '';
+    let practicePageIndex = 0;
+    const practicePageSize = 10;
+
+    // -------------------------------------------------------------
+    // Initializer
+    // -------------------------------------------------------------
+    document.addEventListener("DOMContentLoaded", () => {
+      renderAllTables();
+      setupEventListeners();
+      setupSidebarHighlighting();
+    });
+
+    // -------------------------------------------------------------
+    // Core Render Methods
+    // -------------------------------------------------------------
+    function renderAllTables() {
+      // 1. Render Natural Language Translator
+      renderTranslatorTable(DATA_TRANSLATOR);
+
+      // 2. Render Pattern Recognition
+      renderPatternsTable(DATA_PATTERNS);
+
+      // 3. Render Common Mistakes
+      renderMistakes(DATA_MISTAKES);
+
+      // 4. Render Practice Challenge Cards
+      renderPracticeCards();
+    }
+
+    function renderTranslatorTable(data, searchVal = "") {
+      const tbody = document.getElementById("body-translator");
+      tbody.innerHTML = "";
+      
+      data.forEach(item => {
+        const row = document.createElement("tr");
+        
+        let phraseHTML = highlightMatchedText(item.phrase, searchVal);
+        let meaningHTML = highlightMatchedText(item.meaning, searchVal);
+        let joinBadgeClass = getJoinBadgeClass(item.join);
+        
+        row.innerHTML = `
+          <td><strong>${phraseHTML}</strong></td>
+          <td>${meaningHTML}</td>
+          <td><span class="badge ${joinBadgeClass}">${item.join}</span></td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function renderPatternsTable(data, searchVal = "") {
+      const tbody = document.getElementById("body-patterns");
+      tbody.innerHTML = "";
+      
+      data.forEach(item => {
+        const row = document.createElement("tr");
+        let sayHTML = highlightMatchedText(item.say, searchVal);
+        let thinkHTML = highlightMatchedText(item.think, searchVal);
+        let badgeClass = getJoinBadgeClass(item.join);
+        
+        row.innerHTML = `
+          <td><strong>"${sayHTML}"</strong></td>
+          <td>${thinkHTML}</td>
+          <td><span class="badge ${badgeClass}">${item.join}</span></td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function renderMistakes(data, searchVal = "") {
+      const container = document.getElementById("container-mistakes");
+      container.innerHTML = "";
+      
+      data.forEach(item => {
+        // Skip if search queries do not match name or explanation
+        if (searchVal && 
+            !item.name.toLowerCase().includes(searchVal.toLowerCase()) && 
+            !item.explain.toLowerCase().includes(searchVal.toLowerCase())) {
+          return;
+        }
+
+        const card = document.createElement("div");
+        card.className = "compare-card";
+        card.style.borderLeft = "4px solid #f43f5e";
+        
+        let highlightedName = highlightMatchedText(item.name, searchVal);
+        let highlightedExplain = highlightMatchedText(item.explain, searchVal);
+        
+        card.innerHTML = `
+          <div class="compare-card-title" style="color: #f43f5e;">
+            <strong>Mistake #${item.id}: ${highlightedName}</strong>
+          </div>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5;">
+            ${highlightedExplain}
+          </p>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 10px;">
+            <div>
+              <div style="font-size: 11px; font-weight: 700; color: #f43f5e; margin-bottom: 4px;">❌ INCORRECT QUERY</div>
+              <pre><code class="lang-sql">${highlightSQL(item.bad)}</code></pre>
+            </div>
+            <div>
+              <div style="font-size: 11px; font-weight: 700; color: var(--color-inner); margin-bottom: 4px;">✅ CORRECTED QUERY</div>
+              <pre><code class="lang-sql">${highlightSQL(item.good)}</code></pre>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      if (container.children.length === 0) {
+        container.innerHTML = `<div style="text-align: center; color: var(--text-dark); padding: 20px;">No common mistakes match your query.</div>`;
+      }
+    }
+
+    function renderPracticeCards() {
+      const container = document.getElementById("practice-cards-container");
+      container.innerHTML = "";
+
+      // Apply Search Filter & Badge Type Filter
+      let filtered = DATA_PRACTICE.filter(item => {
+        // Badge filter
+        if (practiceFilter !== 'all') {
+          if (practiceFilter === 'LEFT JOIN' && !item.join.includes('LEFT JOIN')) return false;
+          if (practiceFilter === 'INNER JOIN' && !item.join.includes('INNER JOIN')) return false;
+          if (practiceFilter === 'RIGHT JOIN' && !item.join.includes('RIGHT JOIN')) return false;
+          if (practiceFilter === 'FULL OUTER JOIN' && !item.join.includes('FULL OUTER JOIN')) return false;
+          if (practiceFilter === 'CROSS JOIN' && !item.join.includes('CROSS JOIN')) return false;
+          if (practiceFilter === 'SELF JOIN' && !item.join.includes('SELF JOIN')) return false;
+        }
+
+        // Search Filter
+        if (practiceSearchQuery) {
+          const matchQ = item.q.toLowerCase().includes(practiceSearchQuery.toLowerCase());
+          const matchJ = item.join.toLowerCase().includes(practiceSearchQuery.toLowerCase());
+          const matchE = item.explain.toLowerCase().includes(practiceSearchQuery.toLowerCase());
+          return matchQ || matchJ || matchE;
+        }
+
+        return true;
+      });
+
+      // Pagination Calculation
+      const totalItems = filtered.length;
+      const totalPages = Math.ceil(totalItems / practicePageSize);
+      
+      // Bounds check pageIndex
+      if (practicePageIndex >= totalPages) practicePageIndex = Math.max(0, totalPages - 1);
+      
+      const startIdx = practicePageIndex * practicePageSize;
+      const endIdx = Math.min(startIdx + practicePageSize, totalItems);
+      
+      const paginated = filtered.slice(startIdx, endIdx);
+
+      // Update Pagination Stats label
+      const pageInfo = document.getElementById("practice-page-info");
+      if (totalItems === 0) {
+        pageInfo.textContent = "No questions found matching current criteria.";
+      } else {
+        pageInfo.textContent = `Showing ${startIdx + 1}-${endIdx} of ${totalItems} scenarios`;
+      }
+
+      // Render Active Page Cards
+      paginated.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "practice-card";
+        card.id = `practice-card-${item.id}`;
+        
+        let highlightedQ = highlightMatchedText(item.q, practiceSearchQuery);
+        let badgeClass = getJoinBadgeClass(item.join);
+        
+        card.innerHTML = `
+          <div class="practice-card-header">
+            <span>SCENARIO #${item.id}</span>
+          </div>
+          <div class="practice-card-question">
+            ${highlightedQ}
+          </div>
+          <button class="practice-reveal-btn" onclick="revealPracticeCard(${item.id})">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/></svg>
+            Reveal Target JOIN & Query
+          </button>
+          <div class="practice-reveal-section">
+            <div style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+              <span style="font-weight: 700; font-size: 13px;">Correct Join:</span>
+              <span class="badge ${badgeClass}">${item.join}</span>
+            </div>
+            <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px;">
+              ${item.explain}
+            </p>
+            <div style="position: relative;">
+              <pre><code class="lang-sql">${highlightSQL(item.sql)}</code></pre>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // -------------------------------------------------------------
+    // Helper & Utility Methods
+    // -------------------------------------------------------------
+    function highlightMatchedText(str, matchVal) {
+      if (!matchVal) return str;
+      const regex = new RegExp(`(${escapeRegex(matchVal)})`, "gi");
+      return str.replace(regex, "<mark>$1</mark>");
+    }
+
+    function escapeRegex(string) {
+      return string.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&');
+    }
+
+    function getJoinBadgeClass(joinType) {
+      const type = joinType.toUpperCase();
+      if (type.includes("INNER")) return "badge-inner";
+      if (type.includes("LEFT")) return "badge-left";
+      if (type.includes("RIGHT")) return "badge-right";
+      if (type.includes("FULL")) return "badge-full";
+      if (type.includes("CROSS")) return "badge-cross";
+      if (type.includes("SELF")) return "badge-self";
+      if (type.includes("NATURAL") || type.includes("USING")) return "badge-natural";
+      return "badge-inner";
+    }
+
+    // Custom Lightweight Regex SQL Highlighter
+    function highlightSQL(sql) {
+      let html = sql
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+      
+      const keywords = [
+        "SELECT", "FROM", "INNER JOIN", "LEFT JOIN", "RIGHT JOIN", "FULL OUTER JOIN", 
+        "FULL JOIN", "CROSS JOIN", "NATURAL JOIN", "JOIN", "ON", "WHERE", "AND", 
+        "OR", "USING", "AS", "GROUP BY", "ORDER BY", "HAVING", "LIMIT",
+        "UNION", "UNION ALL", "ALL", "CASE", "WHEN", "THEN", "ELSE", "END", "IS", "NULL",
+        "INSERT", "UPDATE", "DELETE", "CREATE", "TABLE"
+      ];
+      
+      keywords.sort((a, b) => b.length - a.length);
+      
+      // Match and highlight string patterns
+      html = html.replace(/'([^']*)'/g, '<span class="sql-str">\'$1\'</span>');
+      // Match digits
+      html = html.replace(/\b(\d+)\b/g, '<span class="sql-num">$1</span>');
+      // Highlight standard commands
+      const keywordRegex = new RegExp(`\\b(${keywords.join("|")})\\b`, "gi");
+      html = html.replace(keywordRegex, (match) => {
+        return `<span class="sql-kw">${match.toUpperCase()}</span>`;
+      });
+      // Highlight inline backticks identifiers
+      html = html.replace(/`([^`\\]*)`/g, '<span class="sql-ident">`$1`</span>');
+      // Comments
+      html = html.replace(/(--.*)/g, '<span class="sql-comment">$1</span>');
+      
+      return html;
+    }
+
+    // -------------------------------------------------------------
+    // Section Expansion Controllers
+    // -------------------------------------------------------------
+    function toggleTreeNode(node) {
+      node.classList.toggle("expanded-detail");
+    }
+
+    function toggleSection(headerNode) {
+      const card = headerNode.closest(".section-card");
+      card.classList.toggle("expanded");
+    }
+
+    // -------------------------------------------------------------
+    // Interactive Venn Diagrams Actions
+    // -------------------------------------------------------------
+    function selectVennRegion(region) {
+      toggleVennToggle(region);
+    }
+
+    function toggleVennToggle(region) {
+      currentVennRegions[region] = !currentVennRegions[region];
+      
+      const btn = document.getElementById(`btn-venn-${region}`);
+      const path = document.getElementById(`region-${region}`);
+      
+      if (currentVennRegions[region]) {
+        btn.classList.add("active");
+        path.classList.add("active-region");
+      } else {
+        btn.classList.remove("active");
+        path.classList.remove("active-region");
+      }
+      
+      updateVennExplanation();
+    }
+
+    function updateVennExplanation() {
+      const { left, matching, right } = currentVennRegions;
+      const textEl = document.getElementById("venn-explanation");
+      
+      if (left && matching && right) {
+        textEl.innerHTML = `<strong>FULL OUTER JOIN (All elements):</strong> Returns all matching rows, all unmatched Left rows, and all unmatched Right rows. Complete Union.`;
+      } else if (!left && matching && !right) {
+        textEl.innerHTML = `<strong>INNER JOIN (Intersection):</strong> Returns only matching rows that reside in both table domains. Filter out all non-associated rows.`;
+      } else if (left && matching && !right) {
+        textEl.innerHTML = `<strong>LEFT JOIN (Left preserve):</strong> Preserves all rows on Left, matching where possible on Right, otherwise padded with NULL.`;
+      } else if (!left && matching && right) {
+        textEl.innerHTML = `<strong>RIGHT JOIN (Right preserve):</strong> Preserves all rows on Right, matching where possible on Left, otherwise padded with NULL.`;
+      } else if (left && !matching && !right) {
+        textEl.innerHTML = `<strong>LEFT ONLY (A - B anti-pattern):</strong> Returns rows from A that do not match anything in B. Executed using <code>LEFT JOIN WHERE B.key IS NULL</code>.`;
+      } else if (!left && !matching && right) {
+        textEl.innerHTML = `<strong>RIGHT ONLY (B - A anti-pattern):</strong> Returns rows from B that do not match anything in A. Executed using <code>RIGHT JOIN WHERE A.key IS NULL</code>.`;
+      } else if (left && !matching && right) {
+        textEl.innerHTML = `<strong>EXCLUSIVE FULL OUTER JOIN:</strong> Returns all unmatched records from both tables. Matches are discarded. Executed using <code>FULL JOIN WHERE A.key IS NULL OR B.key IS NULL</code>.`;
+      } else {
+        textEl.innerHTML = `Click on Venn circles or checkboxes above to check row extraction logic.`;
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Complete JOIN Examples dataset tabs switcher
+    // -------------------------------------------------------------
+    function switchDataset(tabNode, datasetId) {
+      // Toggle Tab button Active state
+      const row = tabNode.closest(".tab-btn-row");
+      row.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+      tabNode.classList.add("active");
+      
+      // Toggle content panel
+      const wrapper = tabNode.closest(".dataset-tab-wrapper");
+      wrapper.querySelectorAll(".dataset-content").forEach(content => {
+        content.classList.remove("active-dataset");
+      });
+      document.getElementById(datasetId).classList.add("active-dataset");
+    }
+
+    // -------------------------------------------------------------
+    // Practice Flashcard State Controllers
+    // -------------------------------------------------------------
+    function revealPracticeCard(cardId) {
+      const card = document.getElementById(`practice-card-${cardId}`);
+      if (card) {
+        card.classList.add("revealed");
+      }
+    }
+
+    function filterPractice(joinType) {
+      practiceFilter = joinType;
+      
+      // Update filter UI active buttons
+      const group = document.querySelector(".practice-filter-group");
+      group.querySelectorAll(".practice-filter-btn").forEach(btn => {
+        btn.classList.remove("active");
+        if (btn.textContent.includes(joinType.replace(" JOIN", "")) || (joinType === 'all' && btn.textContent === 'All')) {
+          btn.classList.add("active");
+        }
+      });
+      
+      practicePageIndex = 0; // reset page
+      renderPracticeCards();
+    }
+
+    function prevPracticePage() {
+      if (practicePageIndex > 0) {
+        practicePageIndex--;
+        renderPracticeCards();
+      }
+    }
+
+    function nextPracticePage() {
+      // Check total size
+      let filteredCount = DATA_PRACTICE.filter(item => {
+        if (practiceFilter !== 'all') {
+          if (practiceFilter === 'LEFT JOIN' && !item.join.includes('LEFT JOIN')) return false;
+          if (practiceFilter === 'INNER JOIN' && !item.join.includes('INNER JOIN')) return false;
+          if (practiceFilter === 'RIGHT JOIN' && !item.join.includes('RIGHT JOIN')) return false;
+          if (practiceFilter === 'FULL OUTER JOIN' && !item.join.includes('FULL OUTER JOIN')) return false;
+          if (practiceFilter === 'CROSS JOIN' && !item.join.includes('CROSS JOIN')) return false;
+          if (practiceFilter === 'SELF JOIN' && !item.join.includes('SELF JOIN')) return false;
+        }
+        if (practiceSearchQuery) {
+          return item.q.toLowerCase().includes(practiceSearchQuery.toLowerCase());
+        }
+        return true;
+      }).length;
+
+      const totalPages = Math.ceil(filteredCount / practicePageSize);
+      if (practicePageIndex < totalPages - 1) {
+        practicePageIndex++;
+        renderPracticeCards();
+      }
+    }
+
+    function randomizePracticeCard() {
+      // Reveal a random card on the active set, or jump page
+      const randIdx = Math.floor(Math.random() * DATA_PRACTICE.length);
+      const question = DATA_PRACTICE[randIdx];
+      
+      // Switch filters to all to ensure it's rendering
+      practiceFilter = 'all';
+      practiceSearchQuery = '';
+      document.getElementById("practice-search").value = "";
+      
+      const filterGroup = document.querySelector(".practice-filter-group");
+      filterGroup.querySelectorAll(".practice-filter-btn").forEach(btn => btn.classList.remove("active"));
+      filterGroup.querySelector(".practice-filter-btn").classList.add("active");
+      
+      // Calculate which page this item is on
+      const targetPageIndex = Math.floor(randIdx / practicePageSize);
+      practicePageIndex = targetPageIndex;
+      
+      renderPracticeCards();
+      
+      // Highlight & Auto-Reveal target card after render completes
+      setTimeout(() => {
+        const card = document.getElementById(`practice-card-${question.id}`);
+        if (card) {
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          card.classList.add("revealed");
+          // Temporary highlight borders
+          card.style.borderColor = "var(--color-left)";
+          setTimeout(() => {
+            card.style.borderColor = "";
+          }, 1500);
+        }
+      }, 300);
+    }
+
+    // -------------------------------------------------------------
+    // Global Filter / Search Action
+    // -------------------------------------------------------------
+    function handleGlobalSearch(query) {
+      query = query.trim();
+
+      // If search query is empty, render baseline states
+      if (!query) {
+        renderAllTables();
+        return;
+      }
+
+      // Filter Translation rows
+      const filteredTranslator = DATA_TRANSLATOR.filter(item => {
+        return item.phrase.toLowerCase().includes(query.toLowerCase()) || 
+               item.meaning.toLowerCase().includes(query.toLowerCase()) || 
+               item.join.toLowerCase().includes(query.toLowerCase());
+      });
+      renderTranslatorTable(filteredTranslator, query);
+
+      // Filter Pattern rows
+      const filteredPatterns = DATA_PATTERNS.filter(item => {
+        return item.say.toLowerCase().includes(query.toLowerCase()) || 
+               item.think.toLowerCase().includes(query.toLowerCase()) || 
+               item.join.toLowerCase().includes(query.toLowerCase());
+      });
+      renderPatternsTable(filteredPatterns, query);
+
+      // Filter common mistakes
+      renderMistakes(DATA_MISTAKES, query);
+
+      // Jump global practice challenges if it has the keyword
+      practiceSearchQuery = query;
+      practicePageIndex = 0;
+      renderPracticeCards();
+
+      // Jump scroll search highlight logic:
+      // If user typed "NULL" or "WHERE" specifically, blink highlight targets in view
+      if (query.toUpperCase() === "NULL") {
+        const target = document.getElementById("section-left-vs-inner");
+        if (target) {
+          target.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Setup Events / Theme togglers
+    // -------------------------------------------------------------
+    function setupEventListeners() {
+      // Global Search input listener
+      const search = document.getElementById("global-search");
+      search.addEventListener("input", (e) => {
+        handleGlobalSearch(e.target.value);
+      });
+
+      // Practice search listener
+      const pSearch = document.getElementById("practice-search");
+      pSearch.addEventListener("input", (e) => {
+        practiceSearchQuery = e.target.value;
+        practicePageIndex = 0;
+        renderPracticeCards();
+      });
+
+      // Expand/Collapse section headers
+      document.querySelectorAll(".section-header").forEach(header => {
+        header.addEventListener("click", () => toggleSection(header));
+      });
+
+      // Theme toggle action
+      document.getElementById("btn-toggle-theme").addEventListener("click", () => {
+        document.body.classList.toggle("light-theme");
+      });
+
+      // Key Bindings help modal toggle
+      document.getElementById("btn-shortcuts").addEventListener("click", () => {
+        document.getElementById("shortcuts-overlay").style.display = "flex";
+      });
+
+      // Print cheat sheet action
+      document.getElementById("btn-print").addEventListener("click", () => {
+        window.print();
+      });
+
+      // Global window keyboard handler
+      window.addEventListener("keydown", (e) => {
+        // Toggle Search Focus (/)
+        if (e.key === "/" && document.activeElement !== search && document.activeElement !== pSearch) {
+          e.preventDefault();
+          search.focus();
+          search.select();
+        }
+        
+        // Escape search focus and modals
+        if (e.key === "Escape") {
+          search.blur();
+          pSearch.blur();
+          closeShortcutsModal();
+        }
+
+        // Randomize practice card (R)
+        if ((e.key === "r" || e.key === "R") && document.activeElement !== search && document.activeElement !== pSearch) {
+          randomizePracticeCard();
+        }
+
+        // Print handler (P)
+        if ((e.key === "p" || e.key === "P") && e.ctrlKey === false && e.metaKey === false && document.activeElement !== search && document.activeElement !== pSearch) {
+          window.print();
+        }
+      });
+      
+      // Sidebar Mobile drawer toggle
+      const mobSidebarToggle = document.getElementById("mobile-sidebar-toggle");
+      const sidebar = document.getElementById("sidebar");
+      mobSidebarToggle.addEventListener("click", () => {
+        sidebar.classList.toggle("show-mobile-sidebar");
+      });
+      
+      // Close mobile sidebar on link clicks
+      sidebar.querySelectorAll("li a").forEach(link => {
+        link.addEventListener("click", () => {
+          sidebar.classList.remove("show-mobile-sidebar");
+        });
+      });
+    }
+
+    function closeShortcutsModal() {
+      document.getElementById("shortcuts-overlay").style.display = "none";
+    }
+
+    // Scrollspy mechanism to highlight active sidebar item
+    function setupSidebarHighlighting() {
+      const sections = document.querySelectorAll("section");
+      const menuItems = document.querySelectorAll(".sidebar-menu li");
+
+      window.addEventListener("scroll", () => {
+        let current = "";
+        sections.forEach(section => {
+          const sectionTop = section.offsetTop;
+          if (pageYOffset >= sectionTop - 120) {
+            current = section.getAttribute("id");
+          }
+        });
+
+        menuItems.forEach(li => {
+          li.classList.remove("active");
+          const a = li.querySelector("a");
+          if (a && a.getAttribute("href").includes(current)) {
+            li.classList.add("active");
+          }
+        });
+      });
+    }
+  </script>
+</body>
+</html>
