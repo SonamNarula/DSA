@@ -9,20 +9,27 @@ public:
 
         sort(arr.begin(), arr.end());
 
-        int left = 0;
-        int right = arr.size() - 1;
+        int n = arr.size();
 
-        while(left < right) {
+        for(int i = 0; i < n; i++) {
 
-            int sum = arr[left].first + arr[right].first;
+            int complement = target - arr[i].first;
 
-            if(sum == target)
-                return {arr[left].second, arr[right].second};
+            int low = i + 1;
+            int high = n - 1;
 
-            if(sum < target)
-                left++;
-            else
-                right--;
+            while(low <= high) {
+
+                int mid = low + (high - low) / 2;
+
+                if(arr[mid].first == complement)
+                    return {arr[i].second, arr[mid].second};
+
+                if(arr[mid].first < complement)
+                    low = mid + 1;
+                else
+                    high = mid - 1;
+            }
         }
 
         return {};
