@@ -1,6 +1,5 @@
 class Solution {
 public:
-// valid palindrome checking
     bool isPalindrome(string s) {
         int i = 0, j = s.size() - 1;
 
