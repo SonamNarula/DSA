@@ -6,13 +6,13 @@
 
 | Total Problems | Topics |
 |---|---|
-| 16 | 16 |
+| 17 | 16 |
 
 ---
 
 ## 📂 Topic-Wise Problems
 
-- [Uncategorized](#uncategorized) (5)
+- [Uncategorized](#uncategorized) (6)
 - [brute force](#brute-force) (1)
 - [combinatorics](#combinatorics) (1)
 - [constructive algorithms](#constructive-algorithms) (4)
@@ -39,6 +39,7 @@
 | 2250B | [String Construction](https://codeforces.com/contest/2250/problem/B) | Unrated | [C++23 (GCC 14-64, msys2)](https://github.com/SonamNarula/DSA/blob/HEAD/2250/B%20-%20String%20Construction/solution.cpp) |
 | 2250C | [Rank Subsequence](https://codeforces.com/contest/2250/problem/C) | Unrated | [C++23 (GCC 14-64, msys2)](https://github.com/SonamNarula/DSA/blob/HEAD/2250/C%20-%20Rank%20Subsequence/solution.cpp) |
 | 2250D | [Permutation Cuts](https://codeforces.com/contest/2250/problem/D) | Unrated | [C++23 (GCC 14-64, msys2)](https://github.com/SonamNarula/DSA/blob/HEAD/2250/D%20-%20Permutation%20Cuts/solution.cpp) |
+| 2250E | [Double-Rift Dial](https://codeforces.com/contest/2250/problem/E) | Unrated | [C++23 (GCC 14-64, msys2)](https://github.com/SonamNarula/DSA/blob/HEAD/2250/E%20-%20Double-Rift%20Dial/solution.cpp) |
 | 2250F | [Xor Permutation Matrix](https://codeforces.com/contest/2250/problem/F) | Unrated | [C++23 (GCC 14-64, msys2)](https://github.com/SonamNarula/DSA/blob/HEAD/2250/F%20-%20Xor%20Permutation%20Matrix/solution.cpp) |
 
 ### brute force
