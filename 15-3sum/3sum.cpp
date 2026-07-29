@@ -1,40 +1,65 @@
 class Solution {
-public:
-    vector<vector<int>> threeSum(vector<int>& nums) {
-        vector<vector<int>> result;
-        int n = nums.size();
-        sort(nums.begin(), nums.end());
 
-        for (int i = 0; i < n - 2; i++) {
-            if (i > 0 && nums[i] == nums[i - 1])
+public:
+
+    vector<vector<int>> threeSum(vector<int>& nums) {
+
+        vector<vector<int>> ans;
+
+        int n=nums.size();
+
+        sort(nums.begin(),nums.end());
+
+        for(int i=0;i<n;i++){
+
+            if(i>0 && nums[i]==nums[i-1])
+
                 continue;
 
-            int j = i + 1;
-            int k = n - 1;
-            int target = -nums[i];
+            int left=i+1;
 
-            while (j < k) {
-                int sum = nums[j] + nums[k];
+            int right=n-1;
 
-                if (sum == target) {
-                    result.push_back({nums[i], nums[j], nums[k]});
+            while(left<right){
 
-                    j++;
-                    k--;
+                int sum=nums[i]+nums[left]+nums[right];
 
-                    // skip duplicates
-                    while (j < k && nums[j] == nums[j - 1])
-                        j++;
+                if(sum<0){
 
-                    while (j < k && nums[k] == nums[k + 1])
-                        k--;
-                } else if (sum < target) {
-                    j++;
-                } else {
-                    k--;
+                    left++;
+
                 }
+
+                else if(sum>0){
+
+                    right--;
+
+                }
+
+                else{
+
+                    ans.push_back({nums[i],nums[left],nums[right]});
+
+                    left++;
+
+                    right--;
+
+                    while(left<right && nums[left]==nums[left-1])
+
+                        left++;
+
+                    while(left<right && nums[right]==nums[right+1])
+
+                        right--;
+
+                }
+
             }
+
         }
-        return result;
+
+        return ans;
+
     }
+
 };
