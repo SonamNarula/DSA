@@ -1,19 +1,14 @@
 class Solution {
 public:
     void reverseString(vector<char>& s) {
+        int left = 0;
+        int right = s.size() - 1;
 
-        // method 1 : stl
-        // reverse(s.begin(), s.end());
-
-
-        // method 2 : 2 pointers
-
-        int start = 0; int end = s.size() - 1;
-
-        while(start<end){
-            swap(s[start], s[end]);
-            start++;
-            end--;
+        while(left < right)
+        {
+            swap(s[left], s[right]);
+            left++;
+            right--;
         }
     }
 };
