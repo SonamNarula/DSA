@@ -1,0 +1,31 @@
+/*
+class Node {
+   public:
+    int data;
+    Node *next;
+
+    Node(int x) {
+        data = x;
+        next = NULL;
+    }
+} */
+
+class Solution {
+public:
+    bool detectLoop(Node* head) {
+
+        Node* fast = head;
+        Node* slow = head;
+
+        while (fast != nullptr && fast->next != nullptr) {
+
+            slow = slow->next;
+            fast = fast->next->next;
+
+            if (slow == fast)
+                return true;
+        }
+
+        return false;
+    }
+};
