@@ -1,43 +1,34 @@
 class Solution {
 public:
     int maxProduct(vector<int>& nums) {
-        int n = nums.size();
 
-        // Maximum product of a subarray ending at current index
-        int bestEnding = nums[0];
+        // Maximum product ending at current index
+        int mx = nums[0];
 
-        // Minimum product is also important because:
-        // negative × negative = positive
-        int worstEnding = nums[0];
+        // Minimum product ending at current index
+        int mn = nums[0];
 
-        // Maximum product found so far
+        // Overall maximum answer
         int ans = nums[0];
 
-        for (int i = 1; i < n; i++) {
+        for (int i = 1; i < nums.size(); i++) {
 
-            // Option 1: Extend the previous maximum product
-            int v1 = bestEnding * nums[i];
+            // Negative number:
+            // maximum becomes minimum and minimum becomes maximum
+            if (nums[i] < 0) {
+                swap(mx, mn);
+            }
 
-            // Option 2: Extend the previous minimum product
-            // This can become maximum if nums[i] is negative
-            int v2 = worstEnding * nums[i];
+            // Either:
+            // 1. Start a new subarray from nums[i]
+            // 2. Extend previous maximum product
+            mx = max(nums[i], mx * nums[i]);
 
-            // Option 3: Start a new subarray from nums[i]
-            int v3 = nums[i];
+            // Same logic for minimum
+            mn = min(nums[i], mn * nums[i]);
 
-            // Best product ending at current index
-            int newBest = max(v1, max(v2, v3));
-
-            // Worst product ending at current index
-            // We need this for future negative numbers
-            int newWorst = min(v1, min(v2, v3));
-
-            // Update both AFTER calculating them
-            bestEnding = newBest;
-            worstEnding = newWorst;
-
-            // Keep track of the best product seen anywhere
-            ans = max(ans, bestEnding);
+            // Update global answer
+            ans = max(ans, mx);
         }
 
         return ans;
