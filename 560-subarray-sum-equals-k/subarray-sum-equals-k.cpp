@@ -1,27 +1,29 @@
-#include <vector>
-using namespace std;
-
 class Solution {
 public:
     int subarraySum(vector<int>& nums, int k) {
-        int count = 0;
-        int n = nums.size();
 
-        // Outer loop: Subarray ka start index track karne ke liye (0 se n-1 tak)
-        for (int i = 0; i < n; i++) {
-            int current_sum = 0; // Har naye starting point 'i' ke liye sum reset karein
-            
-            // Inner loop: Subarray ka end index track karne ke liye (i se n-1 tak)
-            for (int j = i; j < n; j++) {
-                current_sum += nums[j]; // Naya element add karke continuous sum update karein
-                
-                // Agar index i se j tak ka sum 'k' ke barabar mil jaye
-                if (current_sum == k) {
-                    count++; // Valid subarray mil gaya, count badhayein
-                }
+        unordered_map<int, int> mp;
+
+        // Prefix sum 0 already exists once
+        mp[0] = 1;
+
+        int sum = 0;
+        int count = 0;
+
+        for (int i = 0; i < nums.size(); i++) {
+
+            // Current prefix sum
+            sum += nums[i];
+
+            // We need a previous sum = sum - k
+            if (mp.count(sum - k)) {
+                count += mp[sum - k];
             }
+
+            // Store current prefix sum
+            mp[sum]++;
         }
 
-        return count; // Total matching subarrays return karein
+        return count;
     }
 };
