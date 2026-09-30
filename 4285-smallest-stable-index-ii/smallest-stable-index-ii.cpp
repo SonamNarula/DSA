@@ -1,24 +1,26 @@
+#include <vector>
+#include <algorithm>
+
 class Solution {
 public:
-    int firstStableIndex(vector<int>& nums, int k) {
+    int firstStableIndex(std::vector<int>& nums, int k) {
         int n = nums.size();
+        if (n == 0) return -1;
 
-        vector<int> suffixMin(n);
-
-        // Build suffix minimum
-        suffixMin[n - 1] = nums[n - 1];
-
-        for (int i = n - 2; i >= 0; i--) {
-            suffixMin[i] = min(nums[i], suffixMin[i + 1]);
+        // Step 1: Precompute suffix minimums
+        std::vector<int> suffMin(n);
+        suffMin[n - 1] = nums[n - 1];
+        for (int i = n - 2; i >= 0; --i) {
+            suffMin[i] = std::min(nums[i], suffMin[i + 1]);
         }
 
-        // Prefix maximum + check
-        int prefixMax = nums[0];
-
-        for (int i = 0; i < n; i++) {
-            prefixMax = max(prefixMax, nums[i]);
-
-            if (prefixMax - suffixMin[i] <= k) {
+        // Step 2: Compute running prefix maximums and check condition
+        int prefMax = nums[0];
+        for (int i = 0; i < n; ++i) {
+            prefMax = std::max(prefMax, nums[i]);
+            
+            // Check instability score
+            if (prefMax - suffMin[i] <= k) {
                 return i;
             }
         }
