@@ -3,20 +3,20 @@ class Solution:
         MOD = 10**9 + 7
         bit_counts = [0] * 32
         
-        # Count the frequency of set bits at each position
+
         for x in nums:
             for i in range(32):
                 if (x >> i) & 1:
                     bit_counts[i] += 1
                     
-        # Reconstruct the top k numbers to maximize their values
+
         new_nums = [0] * k
         for i in range(32):
             if bit_counts[i] > 0:
                 for j in range(min(k, bit_counts[i])):
                     new_nums[j] |= (1 << i)
                     
-        # Calculate the sum of squares modulo 10^9 + 7
+
         ans = 0
         for x in new_nums:
             ans = (ans + x * x) % MOD
