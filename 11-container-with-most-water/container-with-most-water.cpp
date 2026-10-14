@@ -17,8 +17,6 @@ public:
 
             maxWater = max(maxWater, area);
 
-            // Move the smaller height
-            // because it is limiting the current area
             if (height[left] < height[right]) {
                 left++;
             }
@@ -30,3 +28,6 @@ public:
         return maxWater;
     }
 };
+
+
+
