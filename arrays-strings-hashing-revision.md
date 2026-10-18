@@ -7,6 +7,40 @@
 
 **Link policy (read once).** Problem links use LeetCode's standard problem-slug URL pattern. I have **not** live-verified every URL from this environment. If a link fails, search the problem name on LeetCode. Difficulty labels follow LeetCode's usual labelling and are a guide only.
 
+## At a Glance
+
+| | |
+|---|---|
+| **Version** | 1.0 |
+| **Language** | C++17 |
+| **Problem set** | 34 classic interview problems (LeetCode) + 3 re-solve rows |
+| **Syllabus** | Framework · Big-O · Arrays · Read–Write Pointers · Strings · Two Pointers · Sliding Window · HashMaps/HashSets |
+| **Status boxes** | All blank (☐). Tick only what you have truly done. |
+
+### Document map
+
+| Part | Sections | Use it to |
+|---|---|---|
+| Revision notes | 2–9 | Relearn a pattern: concept, clues, invariant, code, complexity, mistakes, dry run |
+| Decision aids | 10 | Pick a pattern fast; copy a template skeleton |
+| Problem bank and playbook | 11 | Practice the classic questions; check the core insight, trap and follow-up for each |
+| Practice sessions | 12–13 | Run a full day or a light day |
+| Worksheet and tracker | 14–16 | Log attempts, mistakes, confidence and revisit dates |
+| Self-test | 17 | Check recall with short questions and answers |
+
+### Ten working rules
+
+1. Read constraints first and name the target complexity before coding.
+2. State the invariant aloud before writing the loop.
+3. Sorted pair-sum → two pointers. Unsorted and indices needed → HashMap.
+4. Negatives break sum-based sliding windows → prefix sums + HashMap.
+5. Prefix + map: seed `freq[0] = 1`, look up **before** inserting.
+6. Windows: add `a[j]`, shrink with `while`, record the answer in the right place.
+7. Never use `mp[key]` to test existence; use `find` or `count`.
+8. Hash operations are O(1) on average and O(n) in the worst case.
+9. Use `long long` for sums and products; avoid `x - 1` / `x + 1` overflow.
+10. Test empty, one element, all equal, duplicates, negatives.
+
 ---
 
 ## Table of Contents
@@ -20,13 +54,14 @@
 7. [Two Pointers](#7-two-pointers)
 8. [Sliding Window](#8-sliding-window)
 9. [HashMaps and HashSets](#9-hashmaps-and-hashsets)
-10. [Master Pattern Recognition and Decision Tables](#10-master-pattern-recognition-and-decision-tables)
+10. [Master Pattern Recognition and Decision Tables](#10-master-pattern-recognition-and-decision-tables) (includes template sheet)
 11. [Flagship Problem Bank](#11-flagship-problem-bank)
 12. [Five-to-Six-Hour Problem-Solving Day](#12-five-to-six-hour-problem-solving-day)
 13. [Light Revision Plan (60–90 Minutes)](#13-light-revision-plan-6090-minutes)
 14. [Problem-Solving Worksheet and Mistake Log](#14-problem-solving-worksheet-and-mistake-log)
 15. [Progress Tracker](#15-progress-tracker)
 16. [Revision Schedule](#16-revision-schedule)
+17. [Self-Test Question Bank](#17-self-test-question-bank)
 
 ---
 
@@ -527,12 +562,14 @@ string longestPalindrome(const string& s) {
 
 **Dry run.** `s = "babad"`
 
-| center | expand | result |
+| center | expansion | longest at this center |
 |---|---|---|
-| (0,0) | b | len 1 |
-| (1,1) | a → b..b? `s[0]=b, s[2]=b` | "bab" len 3 |
-| (1,2) | a≠b | len 0 |
-| (2,2) | b → a..a | "aba" len 3 (not longer) |
+| (0,0) | `b`; `s[-1]` out of range | `b` (1) |
+| (0,1) | `b` ≠ `a` | none |
+| (1,1) | `a`; then `s[0]=b == s[2]=b` | `bab` (3) |
+| (1,2) | `a` ≠ `b` | none |
+| (2,2) | `b`; then `s[1]=a == s[3]=a`; then `s[0]=b ≠ s[4]=d` | `aba` (3, not longer) |
+| (3,3), (3,4), (4,4) | no expansion beyond the single character | length ≤ 1 |
 
 Answer `"bab"` (or `"aba"`).
 
@@ -666,9 +703,12 @@ Time O(n), space O(1). Brute force O(n²).
 | 1 | 8 | 7 | 7 | 49 | j |
 | 1 | 7 | 3 | 6 | 18 | j |
 | 1 | 6 | 8 | 5 | 40 | j |
-| ... | | | | | |
+| 1 | 5 | 4 | 4 | 16 | j |
+| 1 | 4 | 5 | 3 | 15 | j |
+| 1 | 3 | 2 | 2 | 4 | j |
+| 1 | 2 | 6 | 1 | 6 | j |
 
-Best 49.
+Pointers meet at `i = j = 1`. Best 49.
 
 ### 7.6 Three Sum
 
@@ -1113,19 +1153,60 @@ Answer 4.
 | Group Anagrams (sorted key) | O(N · L log L) | O(N · L) |
 | Longest Consecutive Sequence | O(n) avg | O(n) |
 
+### 10.4 Template Quick-Reference Sheet
+
+Skeletons only; the full, commented versions are in sections 4–9.
+
+```cpp
+// Prefix sum:  pre[0] = 0; pre[i+1] = pre[i] + a[i];  sum(l..r) = pre[r+1] - pre[l]
+
+// Difference array:  diff[l] += v; diff[r+1] -= v;  then running sum over diff
+
+// Kadane:
+cur = max(a[i], cur + a[i]);  best = max(best, cur);          // init both from a[0]
+
+// Subarray sum == K:
+freq[0] = 1;  prefix += x;  count += freq[prefix - k];  ++freq[prefix];   // find(), not []
+
+// Read-write pointers:
+for (i = 0; i < n; ++i) if (keep(a[i])) a[j++] = a[i];        // answer = a[0..j-1]
+
+// Opposite two pointers (sorted):
+while (i < j) { s = a[i] + a[j]; if (s == t) ...; else if (s < t) ++i; else --j; }
+
+// Fixed window:
+window += a[j]; if (j >= k) window -= a[j - k]; if (j >= k - 1) update(best);
+
+// Variable window, longest valid:
+add(a[j]); while (!valid()) remove(a[i++]); best = max(best, j - i + 1);
+
+// Variable window, shortest valid:
+add(a[j]); while (valid()) { best = min(best, j - i + 1); remove(a[i++]); }
+
+// Two Sum (HashMap):
+if (auto it = seen.find(t - a[j]); it != seen.end()) return {it->second, j};  seen[a[j]] = j;
+
+// Longest Consecutive Sequence:
+for (x : set) if (!set.count(x - 1)) { y = x; while (set.count(y + 1)) ++y; best = max(best, y - x + 1); }
+
+// Expand around center:
+expand(c, c); expand(c, c + 1);                                // odd and even centers
+```
+
+
 ---
 
 ## 11. Flagship Problem Bank
 
-**Size.** 29 distinct problems (A2 through H7) plus 3 labelled re-solve rows in Table H. Every one is a classic, frequently asked interview question; all are **Core**. The `Recommended Order` column gives the order within each table. Status boxes are blank.
+**Size.** 34 distinct problems (all LeetCode) plus 3 labelled re-solve rows in Table H. Every one is a classic, frequently asked interview question and is **Core**. The `Recommended Order` column gives the order within each table. Status boxes are blank.
 
 **Selection rules applied.**
-- Only the canonical, most commonly asked interview problems for each learned pattern. Competitive-programming sets and platform-specific extras were removed. Most GeeksforGeeks and InterviewBit interview problems are the same questions as the ones listed here.
+- Only canonical, most commonly asked interview problems for each learned pattern. Competitive-programming sets and platform-specific extras were removed; most GeeksforGeeks and InterviewBit interview questions are the same problems as those listed here.
 - Foundational first, then medium. One Hard (Minimum Window Substring) because it is in the syllabus.
 - No unlearned pattern is mandatory. Exactly K Distinct Integers is deliberately absent.
 - Difference arrays are in the notes (section 4.4) but are rarely asked as a standalone interview question, so no problem is listed for them. Practice the template from the notes if you want it.
 - A problem is repeated only when the second attempt adds something: Table H re-solves Valid Anagram (HashMap version), First Unique Character (map instead of array) and Group Anagrams (count-signature key instead of sorting).
-- Difficulty follows LeetCode's labels. Links use the standard LeetCode problem-slug pattern and are not live-verified; if one fails, search the problem name.
+- Difficulty follows LeetCode's labels. Links are not live-verified; if one fails, search the problem name.
 
 **Syllabus gap.** *Longest Subarray with Sum ≤ K (positives)* is a learned problem but not a famous standalone question. Implement the section 8.5 template yourself and test it on hand-made arrays, including one where every element exceeds K (answer 0). F2 uses the same shrink logic.
 
@@ -1133,15 +1214,16 @@ Answer 4.
 
 | ID | Problem Name | Platform | Difficulty | Primary Pattern | Secondary Pattern | Key Skill Tested | Recommended Order | Estimated Time | Problem Link | Status |
 |---|---|---|---|---|---|---|---|---|---|---|
-| A2 | [Missing Number](https://leetcode.com/problems/missing-number/) | LeetCode | Easy | Complexity comparison | HashSet, math | Brute O(n²) vs set O(n) vs sum formula O(1) space | 1 · Core | 15 min | [Open](https://leetcode.com/problems/missing-number/) | ☐ |
+| A1 | [Fibonacci Number](https://leetcode.com/problems/fibonacci-number/) | LeetCode | Easy | Recursion complexity | Iteration, memoization | Compare O(2ⁿ) recursion, O(n) time, O(1) space loop | 1 · Core | 15 min | [Open](https://leetcode.com/problems/fibonacci-number/) | ☐ |
+| A2 | [Missing Number](https://leetcode.com/problems/missing-number/) | LeetCode | Easy | Complexity comparison | HashSet, math | Brute O(n²) vs set O(n) vs sum formula O(1) space | 2 · Core | 15 min | [Open](https://leetcode.com/problems/missing-number/) | ☐ |
 
-### Table B — Prefix Sum, Suffix Sum, and Difference Arrays
+### Table B — Prefix and Suffix Sums (difference arrays: see section 4.4)
 
 | ID | Problem Name | Platform | Difficulty | Primary Pattern | Secondary Pattern | Key Skill Tested | Recommended Order | Estimated Time | Problem Link | Status |
 |---|---|---|---|---|---|---|---|---|---|---|
-| B2 | [Range Sum Query - Immutable](https://leetcode.com/problems/range-sum-query-immutable/) | LeetCode | Easy | Prefix sum | Class design | O(1) range queries via `pre[r+1]-pre[l]` | 1 · Core | 15 min | [Open](https://leetcode.com/problems/range-sum-query-immutable/) | ☐ |
-| B3 | [Find Pivot Index](https://leetcode.com/problems/find-pivot-index/) | LeetCode | Easy | Prefix sum | Total-sum trick | Left sum vs right sum, edge indices | 2 · Core | 15 min | [Open](https://leetcode.com/problems/find-pivot-index/) | ☐ |
-| B4 | [Product of Array Except Self](https://leetcode.com/problems/product-of-array-except-self/) | LeetCode | Medium | Prefix/suffix products | In-place output | Two-pass prefix/suffix without division | 3 · Core | 25 min | [Open](https://leetcode.com/problems/product-of-array-except-self/) | ☐ |
+| B1 | [Range Sum Query - Immutable](https://leetcode.com/problems/range-sum-query-immutable/) | LeetCode | Easy | Prefix sum | Class design | O(1) range queries via `pre[r+1]-pre[l]` | 1 · Core | 15 min | [Open](https://leetcode.com/problems/range-sum-query-immutable/) | ☐ |
+| B2 | [Find Pivot Index](https://leetcode.com/problems/find-pivot-index/) | LeetCode | Easy | Prefix sum | Total-sum trick | Left sum vs right sum, edge indices | 2 · Core | 15 min | [Open](https://leetcode.com/problems/find-pivot-index/) | ☐ |
+| B3 | [Product of Array Except Self](https://leetcode.com/problems/product-of-array-except-self/) | LeetCode | Medium | Prefix/suffix products | In-place output | Two-pass prefix/suffix without division | 3 · Core | 25 min | [Open](https://leetcode.com/problems/product-of-array-except-self/) | ☐ |
 
 ### Table C — Kadane and Subarray Problems
 
@@ -1166,9 +1248,10 @@ Answer 4.
 | ID | Problem Name | Platform | Difficulty | Primary Pattern | Secondary Pattern | Key Skill Tested | Recommended Order | Estimated Time | Problem Link | Status |
 |---|---|---|---|---|---|---|---|---|---|---|
 | E1 | [Valid Palindrome](https://leetcode.com/problems/valid-palindrome/) | LeetCode | Easy | Opposite two pointers | String cleaning | Skip non-alphanumerics, case-insensitive compare | 1 · Core | 15 min | [Open](https://leetcode.com/problems/valid-palindrome/) | ☐ |
-| E3 | [Two Sum II - Input Array Is Sorted](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/) | LeetCode | Medium | Opposite two pointers | — | Why sortedness allows discarding | 2 · Core | 15 min | [Open](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/) | ☐ |
-| E4 | [Container With Most Water](https://leetcode.com/problems/container-with-most-water/) | LeetCode | Medium | Opposite two pointers | Greedy argument | Move the shorter wall; justify it | 3 · Core | 25 min | [Open](https://leetcode.com/problems/container-with-most-water/) | ☐ |
-| E5 | [3Sum](https://leetcode.com/problems/3sum/) | LeetCode | Medium | Sort + two pointers | Duplicate skipping | Skip duplicates at all three positions | 4 · Core | 40 min | [Open](https://leetcode.com/problems/3sum/) | ☐ |
+| E2 | [Valid Palindrome II](https://leetcode.com/problems/valid-palindrome-ii/) | LeetCode | Easy | Opposite two pointers | One-mismatch tolerance | On mismatch, try skipping either side once | 2 · Core | 20 min | [Open](https://leetcode.com/problems/valid-palindrome-ii/) | ☐ |
+| E3 | [Two Sum II - Input Array Is Sorted](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/) | LeetCode | Medium | Opposite two pointers | — | Why sortedness allows discarding | 3 · Core | 15 min | [Open](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/) | ☐ |
+| E4 | [Container With Most Water](https://leetcode.com/problems/container-with-most-water/) | LeetCode | Medium | Opposite two pointers | Greedy argument | Move the shorter wall; justify it | 4 · Core | 25 min | [Open](https://leetcode.com/problems/container-with-most-water/) | ☐ |
+| E5 | [3Sum](https://leetcode.com/problems/3sum/) | LeetCode | Medium | Sort + two pointers | Duplicate skipping | Skip duplicates at all three positions | 5 · Core | 40 min | [Open](https://leetcode.com/problems/3sum/) | ☐ |
 
 ### Table F — Sliding Window
 
@@ -1177,7 +1260,9 @@ Answer 4.
 | F1 | [Maximum Average Subarray I](https://leetcode.com/problems/maximum-average-subarray-i/) | LeetCode | Easy | Fixed window | Running sum | Add entering / remove leaving element | 1 · Core | 15 min | [Open](https://leetcode.com/problems/maximum-average-subarray-i/) | ☐ |
 | F2 | [Minimum Size Subarray Sum](https://leetcode.com/problems/minimum-size-subarray-sum/) | LeetCode | Medium | Variable window (shortest) | Positive integers | Shrink while still valid; record inside loop | 2 · Core | 25 min | [Open](https://leetcode.com/problems/minimum-size-subarray-sum/) | ☐ |
 | F3 | [Longest Substring Without Repeating Characters](https://leetcode.com/problems/longest-substring-without-repeating-characters/) | LeetCode | Medium | Variable window (longest) | HashMap / last-seen array | Window invariant: no duplicates | 3 · Core | 30 min | [Open](https://leetcode.com/problems/longest-substring-without-repeating-characters/) | ☐ |
-| F5 | [Minimum Window Substring](https://leetcode.com/problems/minimum-window-substring/) | LeetCode | Hard | Variable window (shortest) | Frequency map, `missing` counter | Validity tracking with multiplicity | 4 · Core | 50 min | [Open](https://leetcode.com/problems/minimum-window-substring/) | ☐ |
+| F4 | [Find All Anagrams in a String](https://leetcode.com/problems/find-all-anagrams-in-a-string/) | LeetCode | Medium | Fixed window | Frequency array | Slide a |p|-length window; compare counts | 4 · Core | 30 min | [Open](https://leetcode.com/problems/find-all-anagrams-in-a-string/) | ☐ |
+| F5 | [Longest Repeating Character Replacement](https://leetcode.com/problems/longest-repeating-character-replacement/) | LeetCode | Medium | Variable window (longest) | Max-frequency invariant | Valid iff window length − max frequency ≤ k | 5 · Core | 35 min | [Open](https://leetcode.com/problems/longest-repeating-character-replacement/) | ☐ |
+| F6 | [Minimum Window Substring](https://leetcode.com/problems/minimum-window-substring/) | LeetCode | Hard | Variable window (shortest) | Frequency map, `missing` counter | Validity tracking with multiplicity | 6 · Core | 50 min | [Open](https://leetcode.com/problems/minimum-window-substring/) | ☐ |
 
 ### Table G — Strings and Palindromes
 
@@ -1195,13 +1280,58 @@ Answer 4.
 | H1 | [Contains Duplicate](https://leetcode.com/problems/contains-duplicate/) | LeetCode | Easy | HashSet | Sorting alternative | `insert().second` membership/dedup | 1 · Core | 10 min | [Open](https://leetcode.com/problems/contains-duplicate/) | ☐ |
 | H2 | [Two Sum](https://leetcode.com/problems/two-sum/) | LeetCode | Easy | HashMap complement | Value-to-index map | Lookup complement before inserting | 2 · Core | 15 min | [Open](https://leetcode.com/problems/two-sum/) | ☐ |
 | H3 | [Ransom Note](https://leetcode.com/problems/ransom-note/) | LeetCode | Easy | Frequency counting | Array vs map | Count then consume, early exit | 3 · Core | 10 min | [Open](https://leetcode.com/problems/ransom-note/) | ☐ |
-| H5 | [Intersection of Two Arrays](https://leetcode.com/problems/intersection-of-two-arrays/) | LeetCode | Easy | HashSet | Set intersection | Deduplicated membership checks | 4 · Core | 15 min | [Open](https://leetcode.com/problems/intersection-of-two-arrays/) | ☐ |
-| H-G1 | [Valid Anagram (re-solve; see G1)](https://leetcode.com/problems/valid-anagram/) | LeetCode | Easy | Frequency counting | HashMap<char,int> | Re-solve with a HashMap to handle the Unicode follow-up | 5 · Core | 10 min | [Open](https://leetcode.com/problems/valid-anagram/) | ☐ |
-| H-G2 | [First Unique Character (re-solve; see G2)](https://leetcode.com/problems/first-unique-character-in-a-string/) | LeetCode | Easy | Frequency map | Two-pass scan | Re-solve with `unordered_map`; do not iterate the map for order | 6 · Core | 10 min | [Open](https://leetcode.com/problems/first-unique-character-in-a-string/) | ☐ |
-| H-G3 | [Group Anagrams (re-solve; see G3)](https://leetcode.com/problems/group-anagrams/) | LeetCode | Medium | HashMap grouping | Canonical key | Re-solve with the 26-count key instead of sorting | 7 · Core | 25 min | [Open](https://leetcode.com/problems/group-anagrams/) | ☐ |
-| H7 | [Longest Consecutive Sequence](https://leetcode.com/problems/longest-consecutive-sequence/) | LeetCode | Medium | HashSet | Sequence-start check | Walk only from `x` where `x-1` is absent | 8 · Core | 35 min | [Open](https://leetcode.com/problems/longest-consecutive-sequence/) | ☐ |
+| H4 | [Intersection of Two Arrays](https://leetcode.com/problems/intersection-of-two-arrays/) | LeetCode | Easy | HashSet | Set intersection | Deduplicated membership checks | 4 · Core | 15 min | [Open](https://leetcode.com/problems/intersection-of-two-arrays/) | ☐ |
+| H5 | [Majority Element](https://leetcode.com/problems/majority-element/) | LeetCode | Easy | HashMap frequency | — | Count with a map; know the n/2 threshold | 5 · Core | 10 min | [Open](https://leetcode.com/problems/majority-element/) | ☐ |
+| H-G1 | [Valid Anagram (re-solve; see G1)](https://leetcode.com/problems/valid-anagram/) | LeetCode | Easy | Frequency counting | HashMap<char,int> | Re-solve with a HashMap to handle the Unicode follow-up | 6 · Core | 10 min | [Open](https://leetcode.com/problems/valid-anagram/) | ☐ |
+| H-G2 | [First Unique Character (re-solve; see G2)](https://leetcode.com/problems/first-unique-character-in-a-string/) | LeetCode | Easy | Frequency map | Two-pass scan | Re-solve with `unordered_map`; do not iterate the map for order | 7 · Core | 10 min | [Open](https://leetcode.com/problems/first-unique-character-in-a-string/) | ☐ |
+| H-G3 | [Group Anagrams (re-solve; see G3)](https://leetcode.com/problems/group-anagrams/) | LeetCode | Medium | HashMap grouping | Canonical key | Re-solve with the 26-count key instead of sorting | 8 · Core | 25 min | [Open](https://leetcode.com/problems/group-anagrams/) | ☐ |
+| H6 | [Longest Consecutive Sequence](https://leetcode.com/problems/longest-consecutive-sequence/) | LeetCode | Medium | HashSet | Sequence-start check | Walk only from `x` where `x-1` is absent | 9 · Core | 35 min | [Open](https://leetcode.com/problems/longest-consecutive-sequence/) | ☐ |
 
 **Table H note.** Rows `H-G1` to `H-G3` are not new problems; they are deliberate re-solves with a different data-structure choice. You can do them as the end-of-session re-solve (section 12).
+
+### Solution Playbook
+
+Use this **after** attempting a problem, or as a quick pre-interview skim. One line per problem: the idea to recognise, the complexity jump, and the classic trap or follow-up.
+
+| ID | Problem | Core insight | Brute force → Optimized | Classic trap / follow-up |
+|---|---|---|---|---|
+| A1 | Fibonacci Number | Naive recursion recomputes the same subproblems. | O(2ⁿ) calls (≈φⁿ) → O(n) time, O(1) space with two rolling variables | State the call-tree growth; memoization gives O(n) time but O(n) space. Matrix exponentiation is outside the syllabus. |
+| A2 | Missing Number | Sum of 0..n is n(n+1)/2; subtract the actual sum. | O(n²) search or O(n) set → O(n) time, O(1) space | Use `long long` for the formula; XOR is an overflow-free alternative. |
+| B1 | Range Sum Query - Immutable | `sum(l..r) = pre[r+1] - pre[l]` with `pre[0] = 0`. | O(n) per query → O(1) per query after O(n) build | Prefix array has size n+1; avoid `int` overflow. |
+| B2 | Find Pivot Index | Left sum equals total − left − a[i]. | O(n²) → O(n) with total sum | Return the leftmost pivot; index 0 has left sum 0 and the last index has right sum 0. |
+| B3 | Product of Array Except Self | Answer = product of left side × product of right side. | O(n²) or division → O(n) two passes, O(1) extra | Division breaks on zeros; write the suffix pass directly into the output array. |
+| C1 | Maximum Subarray | Kadane: extend the previous subarray or restart at the current element. | O(n²) → O(n), O(1) | Initialise from `a[0]`, not 0 (all-negative arrays). Follow-up: return the subarray indices. |
+| C2 | Best Time to Buy and Sell Stock | Track the minimum price so far; best profit = price − minSoFar. | O(n²) → O(n), O(1) | Answer is 0 if prices only fall; only one transaction. |
+| C3 | Subarray Sum Equals K | Count earlier prefixes equal to `prefix − k` using a frequency map. | O(n²) → O(n) average, O(n) space | `freq[0] = 1`; lookup **before** inserting; sliding window fails with negatives. |
+| C4 | Rotate Array | Reverse all, then the first k, then the rest. | O(n) extra array → O(n) time, O(1) space | `k %= n` first; right vs left rotation changes which part is reversed. |
+| D1 | Move Zeroes | Write pointer `j` marks the next non-zero slot. | O(n²) shifting → O(n), O(1) | Follow-up: minimise writes (skip the swap when `i == j`). |
+| D2 | Remove Element | Copy every element not equal to `val` forward. | O(n²) erase → O(n), O(1) | Return the new length; values past it are irrelevant. If order does not matter, swap with the end instead. |
+| D3 | Remove Duplicates from Sorted Array | Keep an element only if it differs from the last kept one. | O(n) with an extra set → O(n), O(1) using sortedness | Compare with `a[j-1]`, not `a[i-1]`. |
+| D4 | Remove Duplicates from Sorted Array II | Keep `a[i]` unless it equals the element k places back in the kept region. | O(n) extra space → O(n), O(1) | Generalises to any k: `j < k || a[i] != a[j-k]`. |
+| E1 | Valid Palindrome | Opposite pointers; skip non-alphanumerics; compare lowercase. | O(n) extra reversed copy → O(n), O(1) | Empty string is a palindrome; cast to `unsigned char` for `isalnum`. |
+| E2 | Valid Palindrome II | On the first mismatch, check whether skipping the left or the right character gives a palindrome. | O(n²) try every deletion → O(n), O(1) | Only one deletion is allowed; test **both** sides, using a helper for the inner range. |
+| E3 | Two Sum II - Input Array Is Sorted | Sorted order lets the smaller or larger end be discarded. | O(n²) → O(n), O(1) | Problem is 1-indexed; a HashMap works but breaks the O(1) space requirement. |
+| E4 | Container With Most Water | Start widest; move the shorter wall because moving the taller one cannot increase the area. | O(n²) → O(n), O(1) | Be ready to justify the greedy argument; equal heights: move either. |
+| E5 | 3Sum | Sort, fix an anchor, run two pointers on the rest, skip duplicates. | O(n³) → O(n²), O(1) extra | Skip duplicate anchors and, after a hit, duplicate left/right values; break early when the anchor > 0. |
+| F1 | Maximum Average Subarray I | Fixed window: add the entering element, remove the leaving one. | O(nk) → O(n), O(1) | Divide by k once at the end (use double); negatives are fine for fixed windows. |
+| F2 | Minimum Size Subarray Sum | Expand to reach the target, then shrink while still valid. | O(n²) → O(n), O(1) | Needs positives; record inside the shrink loop; return 0 if no window exists. |
+| F3 | Longest Substring Without Repeating Characters | Window `[i, j]` has no duplicates; jump `i` past the last occurrence. | O(n²)/O(n³) → O(n), O(alphabet) | Ignore last-seen indices left of `i` (`lastSeen[c] >= i`). |
+| F4 | Find All Anagrams in a String | Slide a window of length |p| and compare its counts with p's counts. | O(n·|p| log |p|) sorting each window → O(26·n) | Collect all start indices; compare count arrays or keep a match counter. |
+| F5 | Longest Repeating Character Replacement | Window is valid iff length − (highest frequency in window) ≤ k. | O(n²) → O(n), O(26) | The stored max frequency never needs to decrease: only a larger value can beat the best answer. |
+| F6 | Minimum Window Substring | Track `missing` required characters; shrink while the window is valid. | O(n²) or worse → O(|s| + |t|) | Handle duplicates in t; update the best inside the `while`; `need[c]` goes negative for surplus characters. |
+| G1 | Valid Anagram | Equal character counts ⇔ anagram. | O(n log n) sorting → O(n), O(1) | Check lengths first; state the alphabet; Unicode follow-up → HashMap. |
+| G2 | First Unique Character in a String | Count frequencies, then scan the original string for the first count of 1. | O(n²) → O(n), O(1) | Do not iterate the map to find 'first'. |
+| G3 | Group Anagrams | Group by a canonical key shared by all anagrams. | O(N²·L) pairwise comparison → O(N·L log L) sorted key or O(N·L) count key | Compare the two key choices and their complexity; output order is arbitrary. |
+| G4 | Longest Palindromic Substring | Every palindrome has a center: n odd centers + n−1 even centers. | O(n³) → O(n²), O(1) | Forgetting even centers; computing start/length from `l + 1` and `r - l - 1`. Manacher is outside the syllabus. |
+| H1 | Contains Duplicate | A set answers 'seen before?' in average O(1). | O(n²) → O(n) average, O(n) space (or sort O(n log n)) | `insert().second` detects duplicates in one call. |
+| H2 | Two Sum | Store value → index; look up the complement before inserting the current value. | O(n²) → O(n) average, O(n) space | Duplicates such as `[3,3]` work because of lookup-before-insert. |
+| H3 | Ransom Note | Count letters of the magazine, consume for the ransom note. | O(n·m) → O(n + m), O(1) | Fail as soon as a count goes below 0; use `array<int,26>` for lowercase. |
+| H4 | Intersection of Two Arrays | Put one array in a set, then collect matches from the other. | O(n·m) → O(n + m) average | Result must be unique: erase from the set when a match is found. |
+| H5 | Majority Element | Count frequencies; the majority is the value with count > n/2. | O(n²) → O(n), O(n) | Follow-up: Boyer–Moore voting gets O(1) space (outside the syllabus). |
+| H-G1 | Valid Anagram (re-solve; see G1) | Re-solve with `unordered_map<char,int>` to handle any character set. | Array O(1) space → map O(distinct) | Explain when an array beats a map. |
+| H-G2 | First Unique Character (re-solve; see G2) | Re-solve with a map instead of a fixed array. | Same O(n) | Order still comes from the original string, not the map. |
+| H-G3 | Group Anagrams (re-solve; see G3) | Re-solve using a 26-count signature as the key. | O(N·L log L) → O(N·L) | Build an unambiguous key (for example counts joined with separators). |
+| H6 | Longest Consecutive Sequence | Put all numbers in a set; walk only from values whose predecessor is absent. | O(n log n) sort → O(n) average, O(n) | Starting from every element is O(n²); use `long long` to avoid `x-1` overflow. |
 
 ---
 
@@ -1215,16 +1345,16 @@ If you are unwell, short on sleep, or just drained, **use the light plan in sect
 | Time Block | Duration | Pattern | Selected Problems | Expected Outcome | Break / Recovery Notes |
 |---|---|---|---|---|---|
 | 0:00–0:15 | 15 min | Recall warm-up (no notes) | Write from memory: Two Sum map loop, Kadane, fixed-window template, Longest Consecutive Sequence start-check | Spot which templates are shaky before solving | Drink water before starting |
-| 0:15–1:30 | 75 min | HashMap/HashSet A: frequency, membership, dedup | **Core:** H1 Contains Duplicate, H3 Ransom Note, H5 Intersection of Two Arrays, H2 Two Sum, H-G1 Valid Anagram (map version) | Fluent frequency counting, `find` vs `[]`, set-based dedup | |
+| 0:15–1:30 | 75 min | HashMap/HashSet A: frequency, membership, dedup | **Core:** H1 Contains Duplicate, H3 Ransom Note, H4 Intersection of Two Arrays, H5 Majority Element, H2 Two Sum, H-G1 Valid Anagram (map version) | Fluent frequency counting, `find` vs `[]`, set-based dedup | |
 | 1:30–1:45 | 15 min | Break | — | — | Stand up, water, short walk, no screens if possible |
-| 1:45–2:55 | 70 min | HashMap/HashSet B: grouping, first unique, sequences | **Core:** H-G2 First Unique Character, H-G3 Group Anagrams, H7 Longest Consecutive Sequence. | Canonical keys, order-preserving uniqueness, O(n) sequence starts | Longest Consecutive Sequence is the hardest here; give it 30+ min before reading hints |
+| 1:45–2:55 | 70 min | HashMap/HashSet B: grouping, first unique, sequences | **Core:** H-G2 First Unique Character, H-G3 Group Anagrams, H6 Longest Consecutive Sequence. | Canonical keys, order-preserving uniqueness, O(n) sequence starts | Longest Consecutive Sequence is the hardest here; give it 30+ min before reading hints |
 | 2:55–3:25 | 30 min | Meal break | — | — | Eat properly, hydrate, rest your eyes |
 | 3:25–4:25 | 60 min | Arrays / pointers / window revision | **Core:** C3 Subarray Sum Equals K, D4 Remove Duplicates II, F3 Longest Substring Without Repeating Characters. **Optional:** E5 3Sum, F2 Minimum Size Subarray Sum | Keep non-hash patterns warm; practice choosing between prefix+map, pointers, windows | |
 | 4:25–4:35 | 10 min | Break | — | — | Stretch, water |
-| 4:35–5:15 | 40 min | Re-solve and mistake analysis | Re-solve from a blank file: H7 Longest Consecutive Sequence, G3 Group Anagrams, C3 Subarray Sum Equals K | Confirms you can reproduce the invariants without notes | If one fails, write the cause in the mistake log instead of re-reading everything |
+| 4:35–5:15 | 40 min | Re-solve and mistake analysis | Re-solve from a blank file: H6 Longest Consecutive Sequence, G3 Group Anagrams, C3 Subarray Sum Equals K | Confirms you can reproduce the invariants without notes | If one fails, write the cause in the mistake log instead of re-reading everything |
 | 5:15–5:30 | 15 min | Wrap-up | Update tracker (section 15), mistake log, set revisit dates (section 16) | Clear next actions | Stop here; finish with water and rest |
 
-**Mandatory set:** H1, H3, H5, H2, H-G1, H-G2, H-G3, H7, C3, D4, F3 (11 problems; re-solves are shorter than first attempts).
+**Mandatory set:** H1, H3, H4, H5, H2, H-G1, H-G2, H-G3, H6, C3, D4, F3 (12 problems; re-solves are shorter than first attempts).
 **Optional:** E5, F2 (only if you are energetic and ahead of schedule).
 
 **Rules of the session**
@@ -1244,7 +1374,7 @@ For low-energy days or when time is short.
 | 0:00–0:10 | 10 min | Template recall | Write Two Sum (map), prefix sum + map for K, fixed window from memory | Identify one weak template | Water |
 | 0:10–0:40 | 30 min | HashMap/HashSet | H1 Contains Duplicate, H3 Ransom Note, H-G2 First Unique Character (any two, plus one re-solve) | Fluent counting/membership | |
 | 0:40–0:45 | 5 min | Break | — | — | Stand and stretch |
-| 0:45–1:15 | 30 min | One harder item | **Pick one:** H7 Longest Consecutive Sequence (re-solve) or G3 Group Anagrams | One reliable pattern reproduced | |
+| 0:45–1:15 | 30 min | One harder item | **Pick one:** H6 Longest Consecutive Sequence (re-solve) or G3 Group Anagrams | One reliable pattern reproduced | |
 | 1:15–1:30 | 15 min | Log | Tracker and mistake log, choose tomorrow's first problem | Clear next step | End here; sleep and rest matter |
 
 If you only have 60 minutes: skip the optional re-solve in block 2 and shorten the log to 5 minutes. If you feel unwell, stopping entirely is the right call.
@@ -1303,10 +1433,11 @@ All boxes start empty. Tick them only when true.
 
 | Problem ID | Problem name | Attempted independently? | Brute force understood? | Optimized approach understood? | C++ accepted? | Dry run completed? | Pattern recognized independently? | Revisit date | Notes |
 |---|---|---|---|---|---|---|---|---|---|
+| A1 | Fibonacci Number | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
 | A2 | Missing Number | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
-| B2 | Range Sum Query - Immutable | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
-| B3 | Find Pivot Index | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
-| B4 | Product of Array Except Self | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
+| B1 | Range Sum Query - Immutable | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
+| B2 | Find Pivot Index | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
+| B3 | Product of Array Except Self | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
 | C1 | Maximum Subarray | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
 | C2 | Best Time to Buy and Sell Stock | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
 | C3 | Subarray Sum Equals K | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
@@ -1316,13 +1447,16 @@ All boxes start empty. Tick them only when true.
 | D3 | Remove Duplicates from Sorted Array | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
 | D4 | Remove Duplicates from Sorted Array II | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
 | E1 | Valid Palindrome | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
+| E2 | Valid Palindrome II | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
 | E3 | Two Sum II - Input Array Is Sorted | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
 | E4 | Container With Most Water | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
 | E5 | 3Sum | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
 | F1 | Maximum Average Subarray I | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
 | F2 | Minimum Size Subarray Sum | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
 | F3 | Longest Substring Without Repeating Characters | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
-| F5 | Minimum Window Substring | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
+| F4 | Find All Anagrams in a String | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
+| F5 | Longest Repeating Character Replacement | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
+| F6 | Minimum Window Substring | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
 | G1 | Valid Anagram | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
 | G2 | First Unique Character in a String | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
 | G3 | Group Anagrams | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
@@ -1330,8 +1464,9 @@ All boxes start empty. Tick them only when true.
 | H1 | Contains Duplicate | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
 | H2 | Two Sum | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
 | H3 | Ransom Note | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
-| H5 | Intersection of Two Arrays | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
-| H7 | Longest Consecutive Sequence | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
+| H4 | Intersection of Two Arrays | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
+| H5 | Majority Element | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
+| H6 | Longest Consecutive Sequence | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | | |
 
 ### 15.2 Pattern mastery
 
@@ -1378,4 +1513,33 @@ Always review the mistake log (section 14.2) before each session. Anything that 
 
 ---
 
-*End of register. Remember the link policy at the top: verify any link that fails by searching the problem name on the platform.*
+## 17. Self-Test Question Bank
+
+Cover the right column, answer aloud, then check. Mark the ones you miss in the mistake log.
+
+| # | Question | Answer |
+|---|---|---|
+| 1 | Why seed `freq[0] = 1` in Subarray Sum Equals K? | Lets subarrays that start at index 0 match a prefix of 0. |
+| 2 | Why look up before inserting the current prefix (or value)? | Otherwise the current element can match itself (empty subarray when K = 0; Two Sum pairing an element with itself). |
+| 3 | When does a sum-based sliding window fail? | When values can be negative: growing or shrinking no longer moves the sum monotonically. |
+| 4 | What is the danger of `mp[key]`? | It inserts the key with a default value when missing. |
+| 5 | Are `unordered_map` operations guaranteed O(1)? | No: O(1) average, O(n) worst case. |
+| 6 | Why move the shorter wall in Container With Most Water? | Moving the taller wall cannot increase area (width shrinks, height is capped by the shorter wall). |
+| 7 | Where do you skip duplicates in 3Sum? | At the anchor, and at the left and right pointers after recording a triplet. |
+| 8 | How should Kadane be initialised for all-negative arrays? | `cur = best = a[0]`, not 0. |
+| 9 | Why does a difference array have size n + 1? | So `diff[r + 1] -= v` is safe when r = n − 1. |
+| 10 | Why is Longest Consecutive Sequence O(n) average? | Each sequence is walked once, only from a start where `x − 1` is absent. |
+| 11 | State the Remove Duplicates II invariant. | `a[0..j-1]` is the valid output so far; keep `a[i]` if `j < 2` or `a[i] != a[j-2]`. |
+| 12 | How many centers does Expand Around Center check? | 2n − 1 (n odd, n − 1 even). |
+| 13 | Group Anagrams: complexity with a sorted key vs a count key? | O(N·L log L) vs O(N·L). |
+| 14 | When is a Minimum Window Substring window valid? | When `missing == 0`, i.e., every required character is covered with multiplicity. |
+| 15 | Sliding window has a nested loop; why is it O(n)? | Amortized: each index is added once and removed at most once. |
+| 16 | Auxiliary space vs output space? | Auxiliary is extra memory beyond input and output; output size is reported separately. |
+| 17 | Unsorted array, return original indices of a pair: which tool? | HashMap complement lookup (sorting would lose indices). |
+| 18 | Rotate right by k using reversals: which order? | Reverse all, reverse the first k, reverse the rest (after `k %= n`). |
+| 19 | Why can the stored max frequency go stale in Longest Repeating Character Replacement? | Only a larger max frequency can improve the answer, so a stale (larger) value never produces a wrong longer result. |
+| 20 | Why must First Unique be answered from the original array, not the map? | `unordered_map` iteration order is unspecified; "first" refers to input order. |
+
+---
+
+*End of register. If a link fails, search the problem name on LeetCode.*
