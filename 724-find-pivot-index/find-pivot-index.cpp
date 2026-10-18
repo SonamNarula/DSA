@@ -1,26 +1,34 @@
 class Solution {
 public:
-    int pivotIndex(vector<int>& a) {
-        int n = a.size();
+    int pivotIndex(vector<int>& nums) {
+
+        int n = nums.size();
+
+
         int sum = 0;
 
-        // Step 1: Calculate total sum of the array
-        for (int i = 0; i < n; i++) {
-            sum += a[i];
+        for(int i = 0; i < n; i++){
+            sum += nums[i];
         }
 
-        int left = 0;
 
-        // Step 2: Iterate to find the pivot index
-        for (int i = 0; i < n; i++) {
-            int right = sum - left - a[i];
+        int leftSum = 0;
 
-            if (left == right) {
+
+        for(int i = 0; i < n; i++){
+
+
+            int rightSum = sum - leftSum - nums[i];
+
+
+            if(leftSum == rightSum){
                 return i;
             }
 
-            left += a[i];
+
+            leftSum += nums[i];
         }
+
 
         return -1;
     }
