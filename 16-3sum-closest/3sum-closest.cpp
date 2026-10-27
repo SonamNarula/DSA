@@ -3,16 +3,16 @@ public:
     int threeSumClosest(vector<int>& nums, int target) {
     int n = nums.size();
 
-    // Step 1: Array ko sort karo
+    // Step 1: Array ko sort karenge
     sort(nums.begin(), nums.end());
 
-    // Step 2: Initial closest sum set karo
+    // Step 2: Initial closest sum set karenge
     int closestSum = nums[0] + nums[1] + nums[2];
 
-    // Step 3: Ek element fix karo
+    // Step 3: Ek element fix karenge
     for (int i = 0; i < n - 2; i++) {
 
-        // Step 4: Two pointers initialize karo
+        // Step 4: Two pointers initialize karenge
         int left = i + 1;
         int right = n - 1;
 
@@ -32,12 +32,12 @@ public:
                 return sum;
             }
 
-            // Sum chhota hai, toh increase karo
+            // Sum chhota hai, toh increase karenge
             else if (sum < target) {
                 left++;
             }
 
-            // Sum bada hai, toh decrease karo
+            // Sum bada hai, toh decrease karenge
             else {
                 right--;
             }
