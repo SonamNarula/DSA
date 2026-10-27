@@ -1,45 +1,39 @@
+
 class Solution {
-
 public:
-
     void sortColors(vector<int>& nums) {
+        int n = nums.size();
 
-        int zero = 0;
+        // Three pointers
+        int low = 0;        // Position for the next 0
+        int mid = 0;        // Current element to check
+        int high = n - 1;   // Position for the next 2
 
-        int one = 0;
+        // Process elements until mid crosses high
+        while (mid <= high) {
 
-        int two = 0;
+            // Case 1: Current element is 0
+            if (nums[mid] == 0) {
+                swap(nums[low], nums[mid]);
 
-        for(int num : nums){
+                low++;  // Next position for 0
+                mid++;  // Current element is processed
+            }
 
-            if(num == 0)
+            // Case 2: Current element is 1
+            else if (nums[mid] == 1) {
+                mid++;  // 1 is already in the correct region
+            }
 
-                zero++;
+            // Case 3: Current element is 2
+            else {
+                swap(nums[mid], nums[high]);
 
-            else if(num == 1)
+                high--; // Next position for 2
 
-                one++;
-
-            else
-
-                two++;
-
+                // Don't increment mid!
+                // The swapped element from high is not checked yet.
+            }
         }
-
-        int index = 0;
-
-        while(zero--)
-
-            nums[index++] = 0;
-
-        while(one--)
-
-            nums[index++] = 1;
-
-        while(two--)
-
-            nums[index++] = 2;
-
     }
-
 };
