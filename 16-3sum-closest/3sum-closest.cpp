@@ -1,66 +1,49 @@
 class Solution {
 public:
     int threeSumClosest(vector<int>& nums, int target) {
+    int n = nums.size();
 
-        // Step 1: Sort the array
-        // Sorting allows us to use the two-pointer technique
-        sort(nums.begin(), nums.end());
+    // Step 1: Array ko sort karo
+    sort(nums.begin(), nums.end());
 
-        int n = nums.size();
+    // Step 2: Initial closest sum set karo
+    int closestSum = nums[0] + nums[1] + nums[2];
 
-        // Initially, assume the first 3 elements give us
-        // the closest sum
-        int closest = nums[0] + nums[1] + nums[2];
+    // Step 3: Ek element fix karo
+    for (int i = 0; i < n - 2; i++) {
 
-        // Step 2: Fix one element nums[i]
-        // We need at least 2 elements after i,
-        // hence i < n - 2
-        for(int i = 0; i < n - 2; i++) {
+        // Step 4: Two pointers initialize karo
+        int left = i + 1;
+        int right = n - 1;
 
-            // Left pointer starts just after i
-            int left = i + 1;
+        while (left < right) {
 
-            // Right pointer starts from the last element
-            int right = n - 1;
+            // Current three elements ka sum
+            int sum = nums[i] + nums[left] + nums[right];
 
-            // Keep searching while the two pointers
-            // have not crossed
-            while(left < right) {
+            // Check karo current sum target ke closer hai ya nahi
+            if (abs(sum - target) <
+                abs(closestSum - target)) {
+                closestSum = sum;
+            }
 
-                // Current 3 elements:
-                // nums[i], nums[left], nums[right]
-                int sum = nums[i] + nums[left] + nums[right];
+            // Exact target mil gaya
+            if (sum == target) {
+                return sum;
+            }
 
-                // Check whether current sum is closer
-                // to target than our previous closest sum
-                if(abs(sum - target) < abs(closest - target)) {
-                    closest = sum;
-                }
+            // Sum chhota hai, toh increase karo
+            else if (sum < target) {
+                left++;
+            }
 
-                // If we found exactly the target,
-                // we cannot get anything closer than this
-                if(sum == target) {
-                    return sum;
-                }
-
-                // If sum is smaller than target,
-                // we need to increase the sum.
-                // Since array is sorted, move left forward.
-                if(sum < target) {
-                    left++;
-                }
-
-                // If sum is greater than target,
-                // we need to decrease the sum.
-                // Move right backward.
-                else {
-                    right--;
-                }
+            // Sum bada hai, toh decrease karo
+            else {
+                right--;
             }
         }
-
-        // After checking all possible combinations,
-        // return the sum closest to target
-        return closest;
     }
+
+    return closestSum;
+}
 };
