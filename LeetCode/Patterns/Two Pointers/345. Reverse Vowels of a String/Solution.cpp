@@ -1,9 +1,15 @@
 class Solution {
 public:
-    bool isVowel(char c) {
-        c = tolower(c);
-        return c == 'a' || c == 'e' || c == 'i' ||
-               c == 'o' || c == 'u';
+    bool isVowel(char &ch) {
+        if (ch == 'a' || ch == 'A' ||
+            ch == 'e' || ch == 'E' ||
+            ch == 'i' || ch == 'I' ||
+            ch == 'o' || ch == 'O' ||
+            ch == 'u' || ch == 'U') {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     string reverseVowels(string s) {
@@ -17,6 +23,7 @@ public:
             } else if (!isVowel(s[j])) {
                 j--;
             } else {
+                // both are vowels
                 swap(s[i], s[j]);
                 i++;
                 j--;
