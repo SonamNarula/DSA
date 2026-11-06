@@ -1,7 +1,7 @@
 class Solution {
 public:
     vector<vector<int>> threeSum(vector<int>& nums) {
-        vector<vecto<int>ans>;
+        vector<vector<int>ans>;
 
         int n = nums.size();
 
