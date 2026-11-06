@@ -17,13 +17,13 @@ public:
         // Step 3: Start sliding from index k
         for (int right = k; right < n; right++) {
 
-            // Remove element leaving the window
+
             windowSum -= nums[right - k];
 
-            // Add new element entering the window
+
             windowSum += nums[right];
 
-            // Update maximum sum
+
             maxSum = max(maxSum, windowSum);
         }
 

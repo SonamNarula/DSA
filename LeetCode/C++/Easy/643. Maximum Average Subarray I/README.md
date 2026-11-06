@@ -1,6 +1,6 @@
 # 📝 643. Maximum Average Subarray I (LeetCode)
 
-🔗 [Problem Link](https://leetcode.com/problems/maximum-average-subarray-i/?utm_source=chatgpt.com)
+🔗 [Problem Link](https://leetcode.com/problems/maximum-average-subarray-i/)
 
 ![Difficulty](https://img.shields.io/badge/Difficulty-Easy-brightgreen) ![Language](https://img.shields.io/badge/Language-C++-blue)
 
@@ -8,8 +8,8 @@
 Array, Sliding Window
 
 ### 🚀 Performance
-- **Runtime:** N/A
-- **Memory:** N/A
+- **Runtime:** 2 ms
+- **Memory:** 113.4 MB
 
 ---
 
