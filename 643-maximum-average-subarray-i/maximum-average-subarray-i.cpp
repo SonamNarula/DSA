@@ -4,36 +4,30 @@ public:
 
         int n = nums.size();
 
-        int low = 0;
+        // Step 1: Calculate first window sum
+        double windowSum = 0;
 
-        long long sum = 0;
-
-        double ans = -1e18;
-
-        for (int high = 0; high < n; high++) {
-
-            // Current element ko window mein add karo
-            sum += nums[high];
-
-            // Agar window size k s
-            // e badi ho gayi
-            // toh leftmost element remove karo
-            if (high - low + 1 > k) {
-                sum -= nums[low];
-                low++;
-            }
-
-            // Jab window ka size exactly k ho
-            if (high - low + 1 == k) {
-
-                // Current window ka average
-                double average = (double)sum / k;
-
-                // Maximum average update karo
-                ans = max(ans, average);
-            }
+        for (int i = 0; i < k; i++) {
+            windowSum += nums[i];
         }
 
-        return ans;
+        // Step 2: Initially first window is maximum
+        double maxSum = windowSum;
+
+        // Step 3: Start sliding from index k
+        for (int right = k; right < n; right++) {
+
+
+            windowSum -= nums[right - k];
+
+
+            windowSum += nums[right];
+
+
+            maxSum = max(maxSum, windowSum);
+        }
+
+        // Step 4: Convert maximum sum into average
+        return maxSum / k;
     }
 };
