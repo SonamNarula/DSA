@@ -11,6 +11,7 @@
 class Solution {
 public:
 
+    // Reverse the linked list
     ListNode* reverseList(ListNode* head) {
 
         ListNode* prev = nullptr;
@@ -18,46 +19,43 @@ public:
 
         while (curr != nullptr) {
 
-            ListNode* nextNode = curr->next;
+            ListNode* nextNode = curr->next; // Save next node
 
-            curr->next = prev;
+            curr->next = prev; // Reverse the link
 
             prev = curr;
             curr = nextNode;
         }
 
-        return prev;
+        return prev; // New head
     }
 
     bool isPalindrome(ListNode* head) {
 
-        if (head == nullptr ||
-            head->next == nullptr) {
+        if (head == nullptr || head->next == nullptr)
             return true;
-        }
 
-        // Find middle
+        // Step 1: Find middle using slow & fast
         ListNode* slow = head;
         ListNode* fast = head;
 
-        while (fast != nullptr &&
-               fast->next != nullptr) {
+        while (fast->next != nullptr &&
+               fast->next->next != nullptr) {
 
             slow = slow->next;
             fast = fast->next->next;
         }
 
-        // Reverse second half
-        ListNode* secondHalf = reverseList(slow);
+        // Step 2: Reverse second half
+        ListNode* secondHalf = reverseList(slow->next);
 
+        // Step 3: Compare both halves
         ListNode* firstHalf = head;
 
-        // Compare
         while (secondHalf != nullptr) {
 
-            if (firstHalf->val != secondHalf->val) {
+            if (firstHalf->val != secondHalf->val)
                 return false;
-            }
 
             firstHalf = firstHalf->next;
             secondHalf = secondHalf->next;
