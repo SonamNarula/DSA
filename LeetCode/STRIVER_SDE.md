@@ -3,7 +3,7 @@
 Track your progress on the Striver's SDE Sheet top interview problems.
 
 ## Progress
-- **Completed:** 1 / 76 (1.3%)
+- **Completed:** 2 / 76 (2.6%)
 
 ---
 
@@ -34,7 +34,7 @@ Track your progress on the Striver's SDE Sheet top interview problems.
 
 ### 📂 Linked List
 - [ ] Reverse Linked List
-- [ ] Middle of the Linked List
+- [x] [Middle of the Linked List](./C++/Easy/908. Middle of the Linked List/)
 - [ ] Merge Two Sorted Lists
 - [ ] Remove Nth Node From End of List
 - [ ] Add Two Numbers
