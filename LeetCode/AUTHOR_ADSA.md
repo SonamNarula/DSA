@@ -3,7 +3,7 @@
 Track your progress on the Curated 100hrs Advanced DSA interview preparation list.
 
 ## Progress
-- **Completed:** 2 / 65 (3.1%)
+- **Completed:** 3 / 65 (4.6%)
 
 ---
 
@@ -42,7 +42,7 @@ Track your progress on the Curated 100hrs Advanced DSA interview preparation lis
 
 ### 📂 Module  1.5: Cycle, Intersection & Struc
 - [x] [Linked List Cycle](./C++/Easy/141. Linked List Cycle/)
-- [ ] Linked List Cycle II
+- [x] [Linked List Cycle II](./C++/Medium/142. Linked List Cycle II/)
 - [ ] Intersection of Two Linked Lists
 
 ### 📂 Module  1.6: Sorting, Conversion & Advan
