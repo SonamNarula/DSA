@@ -1,64 +1,58 @@
 class Solution {
 public:
     vector<int> sortedSquares(vector<int>& nums) {
+        
         int n = nums.size();
 
-        // Step 1: First non-negative element ka index find karenge
-        int split = 0;
-
-        while (split < n && nums[split] < 0) {
-            split++;
+        // finding first non negative element
+        int mid = 0;
+        while(mid < n && nums[mid] < 0){
+            mid++;
         }
 
-        vector<int> leftSquares;
-        vector<int> rightSquares;
+        // 2 sorted arrays of squares
+        vector<int>negative;
+        vector<int>positive;
 
-        // Step 2: Negative numbers ko reverse order mein square karenge
-        // Isse leftSquares ascending order mein banega
-        for (int i = split - 1; i >= 0; i--) {
-            leftSquares.push_back(nums[i] * nums[i]);
+        // traversing negative subarray in backward form
+        for(int i = mid-1;i>=0;i--){
+            negative.push_back(nums[i]  * nums[i]);
         }
 
-        // Step 3: Non-negative numbers ko normal order mein square karenge
-        // Ye squares already ascending order mein honge
-        for (int i = split; i < n; i++) {
-            rightSquares.push_back(nums[i] * nums[i]);
+         // traversing positive subarray
+        for(int i = mid;i<n;i++){
+            positive.push_back(nums[i]  * nums[i]);
         }
 
-        // Step 4: Dono sorted arrays ko merge karenge
-        vector<int> result;
+        // merge both sorted array in ans
+        vector<int>ans;
+        int i = 0; //ptr of negative array
+        int j = 0; //ptr of positive array
 
-        int i = 0; // leftSquares ka pointer
-        int j = 0; // rightSquares ka pointer
-
-        // Dono arrays ke elements compare karenge
-        while (i < leftSquares.size() && j < rightSquares.size()) {
-
-            if (leftSquares[i] < rightSquares[j]) {
-                result.push_back(leftSquares[i]);
+        while(i<negative.size() && j<positive.size())
+        {
+            if(negative[i] < positive[j]){
+                ans.push_back(negative[i]);
                 i++;
-            } else {
-                result.push_back(rightSquares[j]);
+            }
+
+            else{
+                ans.push_back(positive[j]);
                 j++;
             }
         }
 
-        // Agar left array mein elements bache hain
-        while (i < leftSquares.size()) {
-            result.push_back(leftSquares[i]);
+        // add remaining elements from -ve 
+        while(i<negative.size()){
+            ans.push_back(negative[i]);
             i++;
         }
-
-        // Agar right array mein elements bache hain
-        while (j < rightSquares.size()) {
-            result.push_back(rightSquares[j]);
+        // add remaining elements from +ve 
+        while(j<positive.size()){
+            ans.push_back(positive[j]);
             j++;
         }
 
-        return result;
+        return ans;
     }
 };
-
-// Synced seamlessly with LeetHub Pro
-// Pro features: https://bit.ly/leethubpro | Free version: https://bit.ly/leethubv4
-// Get it here: https://chromewebstore.google.com/detail/bcilpkkbokcopmabingnndookdogmbna
