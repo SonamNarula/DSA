@@ -1,6 +1,6 @@
 # 📝 242. Valid Anagram (LeetCode)
 
-🔗 [Problem Link](https://leetcode.com/problems/valid-anagram/)
+🔗 [Problem Link](https://leetcode.com/problems/valid-anagram)
 
 ![Difficulty](https://img.shields.io/badge/Difficulty-Easy-brightgreen) ![Language](https://img.shields.io/badge/Language-C++-blue)
 
@@ -8,8 +8,8 @@
 Hash Table, String, Sorting
 
 ### 🚀 Performance
-- **Runtime:** 0 ms
-- **Memory:** 9.7 MB
+- **Runtime:** N/A
+- **Memory:** N/A
 
 ---
 
@@ -17,7 +17,7 @@ Hash Table, String, Sorting
 
 Given two strings  `s`  and  `t` , return  `true`  if  `t`  is an anagram of  `s` , and  `false`  otherwise.
 
-**Example 1:**
+OriginalC++ **Example 1:**
 
 **Input:**  s = "anagram", t = "nagaram"
 
