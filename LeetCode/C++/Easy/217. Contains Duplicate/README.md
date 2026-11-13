@@ -1,6 +1,6 @@
 # 📝 217. Contains Duplicate (LeetCode)
 
-🔗 [Problem Link](https://leetcode.com/problems/contains-duplicate/)
+🔗 [Problem Link](https://leetcode.com/problems/contains-duplicate)
 
 ![Difficulty](https://img.shields.io/badge/Difficulty-Easy-brightgreen) ![Language](https://img.shields.io/badge/Language-C++-blue)
 
@@ -17,7 +17,7 @@ Array, Hash Table, Sorting
 
 Given an integer array  `nums` , return  `true`  if any value appears  **at least twice**  in the array, and return  `false`  if every element is distinct.
 
-**Example 1:**
+OriginalC++ **Example 1:**
 
 **Input:**  nums = [1,2,3,1]
 
