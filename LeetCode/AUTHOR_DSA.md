@@ -3,7 +3,7 @@
 Track your progress on the Curated 100hrs DSA core interview preparation list.
 
 ## Progress
-- **Completed:** 18 / 238 (7.6%)
+- **Completed:** 19 / 238 (8.0%)
 
 ---
 
@@ -88,7 +88,7 @@ Track your progress on the Curated 100hrs DSA core interview preparation list.
 - [ ] Plus One
 
 ### 📂 MODULE  3.4: FREQUENCYLIKE PROBLEMS Cont
-- [ ] Contains Duplicate
+- [x] [Contains Duplicate](./C++/Easy/217. Contains Duplicate/)
 - [ ] Single Number
 - [ ] Single Element in a Sorted Array
 - [ ] Majority Element
