@@ -1,6 +1,8 @@
 class Solution {
 public:
-    bool hasDuplicate(vector<int>& nums) {
+    bool containsDuplicate(vector<int>& nums) {
+
+
         int n = nums.size();
 
         unordered_set<int>seen;
@@ -15,3 +17,4 @@ public:
         
     }
 };
+ 
