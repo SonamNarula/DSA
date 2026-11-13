@@ -3,18 +3,18 @@ public:
     bool containsDuplicate(vector<int>& nums) {
 
 
-        int n = nums.size();
+        sort(nums.begin(), nums.end());
 
-        unordered_set<int>seen;
 
-        for(int i = 0; i < n; i++){
-            if(seen.find(nums[i]) != seen.end()){
+        for (int i = 1; i < nums.size(); i++) {
+
+
+            if (nums[i] == nums[i - 1]) {
                 return true;
             }
-            seen.insert(nums[i]);
         }
+
+
         return false;
-        
     }
 };
- 
