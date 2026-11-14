@@ -2,6 +2,8 @@ class Solution {
 public:
     vector<int> topKFrequent(vector<int>& nums, int k) {
 
+        int n = nums.size();
+
         // Step 1: Count frequency of each element
         unordered_map<int, int> freq;
 
@@ -9,25 +11,34 @@ public:
             freq[num]++;
         }
 
-        // Step 2: Store (frequency, element) pairs
-        vector<pair<int, int>> arr;
+        // Step 2: Create n+1 empty buckets
+        // Index represents frequency
+        vector<vector<int>> bucket(n + 1);
 
+        // Step 3: Place elements into their frequency buckets
         for (auto& entry : freq) {
 
-            // entry.first  = element
-            // entry.second = frequency
+            int element = entry.first;
+            int frequency = entry.second;
 
-            arr.push_back({entry.second, entry.first});
+            bucket[frequency].push_back(element);
         }
 
-        // Step 3: Sort in descending order of frequency
-        sort(arr.begin(), arr.end(), greater<pair<int, int>>());
-
-        // Step 4: Store the first k elements
+        // Step 4: Traverse buckets from highest frequency
         vector<int> ans;
 
-        for (int i = 0; i < k; i++) {
-            ans.push_back(arr[i].second);
+        for (int i = n; i >= 1; i--) {
+
+            // Check all elements having frequency i
+            for (int num : bucket[i]) {
+
+                ans.push_back(num);
+
+                // Stop when we have k elements
+                if (ans.size() == k) {
+                    return ans;
+                }
+            }
         }
 
         return ans;
