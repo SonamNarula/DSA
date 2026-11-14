@@ -8,8 +8,8 @@
 Array, Hash Table, String, Sorting
 
 ### 🚀 Performance
-- **Runtime:** N/A
-- **Memory:** N/A
+- **Runtime:** 20 ms
+- **Memory:** 26.1 MB
 
 ---
 
@@ -17,7 +17,7 @@ Array, Hash Table, String, Sorting
 
 Given an array of strings  `strs` , group the anagrams together. You can return the answer in  **any order** .
 
-OriginalC++ **Example 1:**
+**Example 1:**
 
 **Input:**  strs = ["eat","tea","tan","ate","nat","bat"]
 
