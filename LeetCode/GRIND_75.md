@@ -3,7 +3,7 @@
 Track your progress on the Grind 75 coding interview preparation list.
 
 ## Progress
-- **Completed:** 10 / 75 (13.3%)
+- **Completed:** 11 / 75 (14.7%)
 
 ---
 
@@ -101,7 +101,7 @@ Track your progress on the Grind 75 coding interview preparation list.
 - [ ] Word Search II
 
 ### 📂 Heap
-- [ ] Top K Frequent Elements
+- [x] [Top K Frequent Elements](./C++/Medium/347. Top K Frequent Elements/)
 - [ ] Find Median from Data Stream
 
 ---
