@@ -19,7 +19,7 @@ Given an array of integers  `nums`  and an integer  `k` , return  *the total num
 
 A subarray is a contiguous  **non-empty**  sequence of elements within an array.
 
-OriginalC++ **Example 1:**
+**Example 1:**
 
 ```
 Input: nums = [1,1,1], k = 2
