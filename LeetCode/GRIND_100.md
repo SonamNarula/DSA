@@ -3,7 +3,7 @@
 Track your progress on the Grind 100 coding interview preparation list.
 
 ## Progress
-- **Completed:** 13 / 100 (13.0%)
+- **Completed:** 14 / 100 (14.0%)
 
 ---
 
@@ -24,7 +24,7 @@ Track your progress on the Grind 100 coding interview preparation list.
 
 ### 📂 Subarray & Sliding Window
 - [ ] Maximum Subarray
-- [ ] Subarray Sum Equals K
+- [x] [Subarray Sum Equals K](./C++/Medium/560. Subarray Sum Equals K/)
 - [ ] Sliding Window Maximum
 - [ ] Longest Substring Without Repeating Characters
 - [ ] Find All Anagrams in a String
