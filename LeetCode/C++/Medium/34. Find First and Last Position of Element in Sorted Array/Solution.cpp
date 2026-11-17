@@ -1,50 +1,64 @@
+
 class Solution {
 public:
-    // Find first occurrence
+
     int firstOccurrence(vector<int>& nums, int target) {
-        int start = 0;
-        int end = nums.size() - 1;
+
+        int n = nums.size();
+        int low = 0;
+        int high = n - 1;
         int res = -1;
 
-        while (start <= end) {
+        while (low <= high) {
 
-            int mid = start + (end - start) / 2;
+            int mid = low + (high - low) / 2;
 
             if (nums[mid] == target) {
                 res = mid;
-                end = mid - 1; // Search left
-            } else if (nums[mid] < target) {
-                start = mid + 1; // Search right
-            } else {
-                end = mid - 1; // Search left
+                high = mid - 1;  // Search left
+            }
+
+            else if (nums[mid] > target) {
+                high = mid - 1;
+            }
+
+            else {
+                low = mid + 1;
             }
         }
 
         return res;
     }
 
-    // Find last occurrence
+
     int lastOccurrence(vector<int>& nums, int target) {
-        int start = 0;
-        int end = nums.size() - 1;
+
+        int n = nums.size();
+        int low = 0;
+        int high = n - 1;
         int res = -1;
 
-        while (start <= end) {
+        while (low <= high) {
 
-            int mid = start + (end - start) / 2;
+            int mid = low + (high - low) / 2;
 
             if (nums[mid] == target) {
                 res = mid;
-                start = mid + 1; // Search right
-            } else if (nums[mid] < target) {
-                start = mid + 1; // Search right
-            } else {
-                end = mid - 1; // Search left
+                low = mid + 1;  // Search right
+            }
+
+            else if (nums[mid] > target) {
+                high = mid - 1;
+            }
+
+            else {
+                low = mid + 1;
             }
         }
 
         return res;
     }
+
 
     vector<int> searchRange(vector<int>& nums, int target) {
 
