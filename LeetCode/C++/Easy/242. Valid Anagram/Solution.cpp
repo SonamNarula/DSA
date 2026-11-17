@@ -1,22 +1,19 @@
-class Solution{
-    public:
-    bool isAnagram(string s, string t){
-        // edge cases
-  
-        if(s.size()!=t.size()){
+class Solution {
+public:
+    bool isAnagram(string s, string t) {
+        if(s.length () != t.length ())
+        {
             return false;
         }
-              int freq[26] = {0};
-              
-        for(int i = 0; i < s.size();i++){
-            freq[s[i] - 'a']++;
-            freq[t[i] - 'a']++;
+
+        int freq[26] = {0};
+
+        for(int i = 0; i < s.length();i++){
+            freq[s[i ]- 'a']++;
+            freq[t[i ]- 'a']--;
         }
-
-        // every freq must be 0
-
-        for(int count:freq){
-            if(count != 0){
+        for(int i = 0; i < 26; i++){
+            if(freq[i] != 0){
                 return false;
             }
         }
