@@ -1,16 +1,17 @@
-class Solution {
-public:
-    bool containsDuplicate(vector<int>& nums) {
-        int n = nums.size();
+class Solution{
+    public:
+    bool containsDuplicate(vector<int>& arr){
 
-        sort(nums.begin(), nums.end());
+        int n = arr.size();
 
-        for(int i = 1;i<n;i++){
-            if(nums[i] == nums[i-1]){
+        unordered_set<int>seen;
+
+        for(int i = 0; i < n; i++){
+            if(seen.find(arr[i]) != seen.end()){
                 return true;
             }
+            seen.insert(arr[i]);
         }
         return false;
-        
     }
 };
