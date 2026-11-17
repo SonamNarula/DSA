@@ -1,6 +1,6 @@
 # 📝 35. Search Insert Position (LeetCode)
 
-🔗 [Problem Link](https://leetcode.com/problems/search-insert-position)
+🔗 [Problem Link](https://leetcode.com/problems/search-insert-position/)
 
 ![Difficulty](https://img.shields.io/badge/Difficulty-Easy-brightgreen) ![Language](https://img.shields.io/badge/Language-C++-blue)
 
@@ -19,7 +19,7 @@ Given a sorted array of distinct integers and a target value, return the index i
 
 You must write an algorithm with  `O(log n)`  runtime complexity.
 
-OriginalC++ **Example 1:**
+**Example 1:**
 
 ```
 Input: nums = [1,3,5,6], target = 5
