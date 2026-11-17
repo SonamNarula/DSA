@@ -2,30 +2,18 @@ class Solution {
 public:
     vector<int> twoSum(vector<int>& nums, int target) {
 
-        // Total number of elements in the array
         int n = nums.size();
 
-        // Hash Map: stores {number, index}
-        unordered_map<int, int> mp;
+        unordered_map<int , int>mp;
 
-        // Traverse the array
-        for(int i = 0; i < n; i++){
+        for(int i = 0;i<n;i++){
+            int complement = target-nums[i];
 
-            // Calculate the number needed to reach the target
-            int complement = target - nums[i];
-
-            // Check if complement already exists in the map
-            if(mp.count(complement)){
-
-                // If found, return the index of complement and current index
-                return {mp[complement], i};
+            if(mp.find[complement] != mp.end){
+                return(mp[complement], nums[i]);
             }
-
-            // Store current number along with its index
-            mp[nums[i]] = i;
         }
-
-        // If no valid pair is found, return an empty vector
-        return {};
+        return{};
+        
     }
 };
