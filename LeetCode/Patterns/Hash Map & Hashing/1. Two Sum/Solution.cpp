@@ -2,18 +2,22 @@ class Solution {
 public:
     vector<int> twoSum(vector<int>& nums, int target) {
 
-        int n = nums.size();
+        // Number -> its index
+        unordered_map<int, int> mp;
 
-        unordered_map<int , int>mp;
+        for (int i = 0; i < nums.size(); i++) {
 
-        for(int i = 0;i<n;i++){
-            int complement = target-nums[i];
+            int complement = target - nums[i];
 
-            if(mp.find(complement)!= mp.end()){
-                return(mp[complement], i);
+            // Check if required number was seen earlier
+            if (mp.find(complement) != mp.end()) {
+                return {mp[complement], i};
             }
+
+            // Store current number and its index
+            mp[nums[i]] = i;
         }
-        return{};
-        
+
+        return {};
     }
 };
