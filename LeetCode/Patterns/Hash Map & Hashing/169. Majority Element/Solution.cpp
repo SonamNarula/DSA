@@ -12,7 +12,7 @@ class Solution{
                 candidate = arr[i];
             }
             // element supports the candidate
-            if(nums[i] == candidate){
+            if(arr[i] == candidate){
                 count++;
             }
             //different element cancels 1 vote
