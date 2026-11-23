@@ -8,8 +8,8 @@
 Array, Math, Design, Data Stream, Prefix Sum
 
 ### 🚀 Performance
-- **Runtime:** N/A
-- **Memory:** N/A
+- **Runtime:** 78 ms
+- **Memory:** 99 MB
 
 ---
 
