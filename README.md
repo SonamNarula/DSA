@@ -34,7 +34,7 @@
 
 Synced automatically by SolveBase.
 
-**Total solved: 83**
+**Total solved: 84**
 
 ## Codeforces
 
@@ -51,13 +51,13 @@ Solutions by [hiddeninvariants](https://codeforces.com/profile/hiddeninvariants)
 
 Solutions organized by primary topic folder.
 
-**Solved: 81**
+**Solved: 82**
 
 | Topic | Solved |
 | --- | --- |
 | [C++](./leetcode/C++) | 40 |
 | [Patterns](./leetcode/Patterns) | 40 |
-| [two-pointers](./leetcode/two-pointers) | 1 |
+| [two-pointers](./leetcode/two-pointers) | 2 |
 
 
 ## CSES
