@@ -1,0 +1,702 @@
+[
+  {
+    "id": 1,
+    "q": "Retrieve all employees and their department name. If an employee does not belong to any department, show their details with a NULL department.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT e.name AS employee_name, d.name AS department_name\nFROM employees e\nLEFT JOIN departments d ON e.department_id = d.id;",
+    "explain": "We need to preserve all rows from the Left table (employees), regardless of whether there is a corresponding row in the departments table. A LEFT JOIN is ideal here."
+  },
+  {
+    "id": 2,
+    "q": "Show only the employees who are actively assigned to a department. Exclude employees without a department and departments without employees.",
+    "join": "INNER JOIN",
+    "sql": "SELECT e.name AS employee_name, d.name AS department_name\nFROM employees e\nINNER JOIN departments d ON e.department_id = d.id;",
+    "explain": "We want the intersection: only rows where the employee has a department_id and there is a matching department. This requires an INNER JOIN."
+  },
+  {
+    "id": 3,
+    "q": "List all departments and the names of employees working in them. If a department has no employees, still display the department name.",
+    "join": "LEFT JOIN (or RIGHT JOIN)",
+    "sql": "SELECT d.name AS department_name, e.name AS employee_name\nFROM departments d\nLEFT JOIN employees e ON d.id = e.department_id;",
+    "explain": "To preserve all departments, we place 'departments' on the left and use a LEFT JOIN (or place it on the right and use a RIGHT JOIN)."
+  },
+  {
+    "id": 4,
+    "q": "Display a complete list of all employees and all departments. Include employees who don't have a department and departments that have no employees.",
+    "join": "FULL OUTER JOIN",
+    "sql": "SELECT e.name AS employee_name, d.name AS department_name\nFROM employees e\nFULL OUTER JOIN departments d ON e.department_id = d.id;",
+    "explain": "We must preserve all records from both tables. Rows that don't match on either side will be filled with NULLs. This requires a FULL OUTER JOIN."
+  },
+  {
+    "id": 5,
+    "q": "Generate a grid of all employees paired against every project in the system, so we can check all possible project assignments.",
+    "join": "CROSS JOIN",
+    "sql": "SELECT e.name AS employee_name, p.title AS project_title\nFROM employees e\nCROSS JOIN projects p;",
+    "explain": "We want a Cartesian product: every employee row combined with every project row, without any matching condition. This requires a CROSS JOIN."
+  },
+  {
+    "id": 6,
+    "q": "Find all employees along with the name of their manager. If an employee doesn't have a manager (e.g. the CEO), still display the employee.",
+    "join": "SELF JOIN (LEFT JOIN)",
+    "sql": "SELECT e.name AS employee_name, m.name AS manager_name\nFROM employees e\nLEFT JOIN employees m ON e.manager_id = m.id;",
+    "explain": "Since manager details are in the same employee table, we join the table to itself using aliases. A LEFT JOIN ensures employees without a manager are kept."
+  },
+  {
+    "id": 7,
+    "q": "Find employees who are earning the exact same salary as someone else in the company. Exclude matching an employee with themselves.",
+    "join": "SELF JOIN (INNER JOIN)",
+    "sql": "SELECT e1.name AS emp1, e2.name AS emp2, e1.salary\nFROM employees e1\nINNER JOIN employees e2 ON e1.salary = e2.salary AND e1.id < e2.id;",
+    "explain": "We join the employee table to itself on matching salaries. Using 'e1.id < e2.id' avoids self-matching and filters out duplicate pairs (A-B and B-A)."
+  },
+  {
+    "id": 8,
+    "q": "List all customers and the dates of their orders. Include customers who have never placed an order.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT c.name AS customer_name, o.order_date\nFROM customers c\nLEFT JOIN orders o ON c.id = o.customer_id;",
+    "explain": "All customers must be preserved. Customers with no orders will have a NULL order_date, indicating a LEFT JOIN."
+  },
+  {
+    "id": 9,
+    "q": "Find only the customers who have placed at least one order, returning their name and the order ID.",
+    "join": "INNER JOIN",
+    "sql": "SELECT c.name AS customer_name, o.id AS order_id\nFROM customers c\nINNER JOIN orders o ON c.id = o.customer_id;",
+    "explain": "Only matching customer-order pairs are needed. Customers with no orders are omitted. This requires an INNER JOIN."
+  },
+  {
+    "id": 10,
+    "q": "List all orders along with the customer email. Include orders that might not be linked to a registered customer account (e.g., guest checkouts).",
+    "join": "LEFT JOIN (or RIGHT JOIN)",
+    "sql": "SELECT o.id AS order_id, c.email AS customer_email\nFROM orders o\nLEFT JOIN customers c ON o.customer_id = c.id;",
+    "explain": "We want to preserve all orders, regardless of customer existence. Placing orders on the left and using a LEFT JOIN is correct."
+  },
+  {
+    "id": 11,
+    "q": "List all students and the classes they are enrolled in. Exclude students who are not registered for any classes and empty classes.",
+    "join": "INNER JOIN",
+    "sql": "SELECT s.name AS student_name, c.title AS course_title\nFROM students s\nINNER JOIN enrollments e ON s.id = e.student_id\nINNER JOIN courses c ON e.course_id = c.id;",
+    "explain": "This is a three-table join. Since we want only active student-course pairings, we use INNER JOINs across all connections."
+  },
+  {
+    "id": 12,
+    "q": "List all students and any classes they have enrolled in. Include students who have not registered for any classes.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT s.name AS student_name, c.title AS course_title\nFROM students s\nLEFT JOIN enrollments e ON s.id = e.student_id\nLEFT JOIN courses c ON e.course_id = c.id;",
+    "explain": "We must preserve all students. We LEFT JOIN enrollments, and then LEFT JOIN courses to keep the student records intact even if they have 0 registrations."
+  },
+  {
+    "id": 13,
+    "q": "Show all courses and the students enrolled in them. Include courses that currently have zero students registered.",
+    "join": "LEFT JOIN (or RIGHT JOIN)",
+    "sql": "SELECT c.title AS course_title, s.name AS student_name\nFROM courses c\nLEFT JOIN enrollments e ON c.id = e.course_id\nLEFT JOIN students s ON e.student_id = s.id;",
+    "explain": "To preserve all courses (even empty ones), courses must be the primary (leftmost) table in a chain of LEFT JOINs."
+  },
+  {
+    "id": 14,
+    "q": "List all authors and the titles of books they've written. If an author hasn't written any books, show their name with NULL as the title.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT a.name AS author_name, b.title AS book_title\nFROM authors a\nLEFT JOIN books b ON a.id = b.author_id;",
+    "explain": "Preserves all authors. Authors without matching books in the books table will show NULL for the book title."
+  },
+  {
+    "id": 15,
+    "q": "List all books and their publisher's name. Include books that do not have a publisher assigned yet.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT b.title AS book_title, p.name AS publisher_name\nFROM books b\nLEFT JOIN publishers p ON b.publisher_id = p.id;",
+    "explain": "We want to preserve all books, even if they lack a publisher. Place books on the left and use a LEFT JOIN."
+  },
+  {
+    "id": 16,
+    "q": "Retrieve all publishers and their books. Include publishers who haven't published any books yet.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT p.name AS publisher_name, b.title AS book_title\nFROM publishers p\nLEFT JOIN books b ON p.id = b.publisher_id;",
+    "explain": "All publishers must be preserved. Therefore, publishers is the Left table joined to books using a LEFT JOIN."
+  },
+  {
+    "q": "Match authors and publishers where they reside in the same city. Only return matches.",
+    "join": "INNER JOIN",
+    "sql": "SELECT a.name AS author_name, p.name AS publisher_name, a.city\nFROM authors a\nINNER JOIN publishers p ON a.city = p.city;",
+    "id": 17,
+    "explain": "A standard inner join that matches authors to publishers on the condition of sharing the same city."
+  },
+  {
+    "id": 18,
+    "q": "Show all flights and their arrival airport codes. Include flights that have not landed (arrival airport is NULL/unassigned).",
+    "join": "LEFT JOIN",
+    "sql": "SELECT f.flight_number, a.code AS airport_code\nFROM flights f\nLEFT JOIN airports a ON f.arrival_airport_id = a.id;",
+    "explain": "Flights is the primary table that needs preservation. Unlanded flights will have a NULL airport code, hence a LEFT JOIN."
+  },
+  {
+    "id": 19,
+    "q": "List all airports and the flight numbers landing there. Include airports that currently have no incoming flights.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT a.name AS airport_name, f.flight_number\nFROM airports a\nLEFT JOIN flights f ON a.id = f.arrival_airport_id;",
+    "explain": "We preserve all airports, making it the Left table. We LEFT JOIN flights to ensure airports with no flights are displayed."
+  },
+  {
+    "id": 20,
+    "q": "Show all flight schedules and passenger names, including empty flights and passengers who haven't booked any flights.",
+    "join": "FULL OUTER JOIN",
+    "sql": "SELECT f.flight_number, p.name AS passenger_name\nFROM bookings b\nFULL OUTER JOIN flights f ON b.flight_id = f.id\nFULL OUTER JOIN passengers p ON b.passenger_id = p.id;",
+    "explain": "Both flights (possibly empty) and passengers (possibly without bookings) must be preserved. We use a FULL OUTER JOIN chain."
+  },
+  {
+    "id": 21,
+    "q": "Find all doctor-patient pairs that have a matching appointment. Omit doctors with no patients and patients with no appointments.",
+    "join": "INNER JOIN",
+    "sql": "SELECT d.name AS doctor_name, p.name AS patient_name\nFROM appointments a\nINNER JOIN doctors d ON a.doctor_id = d.id\nINNER JOIN patients p ON a.patient_id = p.id;",
+    "explain": "We only want active appointments. Therefore, we use INNER JOINs to link appointments to doctors and patients."
+  },
+  {
+    "id": 22,
+    "q": "Show all doctors and their patient appointments, including doctors who have not scheduled any appointments.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT d.name AS doctor_name, a.appointment_date, p.name AS patient_name\nFROM doctors d\nLEFT JOIN appointments a ON d.id = a.doctor_id\nLEFT JOIN patients p ON a.patient_id = p.id;",
+    "explain": "Doctors is the primary table. We LEFT JOIN appointments and patients to preserve doctors with zero appointments."
+  },
+  {
+    "id": 23,
+    "q": "Show all patients and their scheduled doctors, including patients who have not booked any appointments.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT p.name AS patient_name, d.name AS doctor_name\nFROM patients p\nLEFT JOIN appointments a ON p.id = a.patient_id\nLEFT JOIN doctors d ON a.doctor_id = d.id;",
+    "explain": "Patients must be preserved. We start with patients on the left and LEFT JOIN appointments and doctors."
+  },
+  {
+    "id": 24,
+    "q": "List all products and their categories. If a product does not belong to a category, show NULL for the category name.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT p.name AS product_name, c.name AS category_name\nFROM products p\nLEFT JOIN categories c ON p.category_id = c.id;",
+    "explain": "Preserves all products. Uncategorized products will display NULL for category_name."
+  },
+  {
+    "id": 25,
+    "q": "Find categories that have products. Exclude empty categories and uncategorized products.",
+    "join": "INNER JOIN",
+    "sql": "SELECT c.name AS category_name, p.name AS product_name\nFROM categories c\nINNER JOIN products p ON c.id = p.category_id;",
+    "explain": "Strict matching between categories and products. Standard INNER JOIN."
+  },
+  {
+    "id": 26,
+    "q": "List all categories, and display the products in them. Include empty categories.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT c.name AS category_name, p.name AS product_name\nFROM categories c\nLEFT JOIN products p ON c.id = p.category_id;",
+    "explain": "Categories must be preserved, even if they contain no products. Place categories on the left of a LEFT JOIN."
+  },
+  {
+    "id": 27,
+    "q": "Produce a combined list of all products and all categories, showing unmatched products and empty categories together.",
+    "join": "FULL OUTER JOIN",
+    "sql": "SELECT p.name AS product_name, c.name AS category_name\nFROM products p\nFULL OUTER JOIN categories c ON p.category_id = c.id;",
+    "explain": "Preserves both tables entirely. Product without categories and categories with no products are kept. Requires a FULL OUTER JOIN."
+  },
+  {
+    "id": 28,
+    "q": "Generate a combinations list of every product in the catalog with every store location.",
+    "join": "CROSS JOIN",
+    "sql": "SELECT p.name AS product_name, s.city AS store_location\nFROM products p\nCROSS JOIN stores s;",
+    "explain": "We need the Cartesian product of products and stores. A CROSS JOIN generates all possible pairs."
+  },
+  {
+    "id": 29,
+    "q": "Find pairs of products in the same category that have the exact same price.",
+    "join": "SELF JOIN",
+    "sql": "SELECT p1.name AS prod1, p2.name AS prod2, p1.price\nFROM products p1\nINNER JOIN products p2 ON p1.category_id = p2.category_id AND p1.price = p2.price AND p1.id < p2.id;",
+    "explain": "A self join matches the products table with itself on category_id and price, excluding self-matches with '<' ID filter."
+  },
+  {
+    "id": 30,
+    "q": "Find all users and their uploaded documents. Include users who have uploaded nothing.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT u.username, d.filename\nFROM users u\nLEFT JOIN documents d ON u.id = d.user_id;",
+    "explain": "Keep all users (Left table) regardless of whether they have uploaded files. Uses a LEFT JOIN."
+  },
+  {
+    "id": 31,
+    "q": "Show only users who have uploaded documents, along with the document filenames.",
+    "join": "INNER JOIN",
+    "sql": "SELECT u.username, d.filename\nFROM users u\nINNER JOIN documents d ON u.id = d.user_id;",
+    "explain": "We only want the intersection of users and documents (exclude document-less users). This is an INNER JOIN."
+  },
+  {
+    "id": 32,
+    "q": "Retrieve all documents in the system and their uploader username. Include documents that are orphaned (have no valid user_id link).",
+    "join": "LEFT JOIN (or RIGHT JOIN)",
+    "sql": "SELECT d.filename, u.username\nFROM documents d\nLEFT JOIN users u ON d.user_id = u.id;",
+    "explain": "Preserve all documents. Place documents on the left and use a LEFT JOIN to link users."
+  },
+  {
+    "id": 33,
+    "q": "Show all projects and the employees assigned to them. Exclude unassigned projects and employee-less projects.",
+    "join": "INNER JOIN",
+    "sql": "SELECT p.title AS project_title, e.name AS employee_name\nFROM projects p\nINNER JOIN employee_projects ep ON p.id = ep.project_id\nINNER JOIN employees e ON ep.employee_id = e.id;",
+    "explain": "Only return active assignments by joining projects to employees via junction table using INNER JOINs."
+  },
+  {
+    "id": 34,
+    "q": "Show all projects and any employees assigned to them. Include projects with no employees assigned.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT p.title AS project_title, e.name AS employee_name\nFROM projects p\nLEFT JOIN employee_projects ep ON p.id = ep.project_id\nLEFT JOIN employees e ON ep.employee_id = e.id;",
+    "explain": "Preserves all projects. We LEFT JOIN the association table and the employee table to keep empty projects."
+  },
+  {
+    "id": 35,
+    "q": "Retrieve all employees and their assigned projects. Include employees who are currently not assigned to any projects.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT e.name AS employee_name, p.title AS project_title\nFROM employees e\nLEFT JOIN employee_projects ep ON e.id = ep.employee_id\nLEFT JOIN projects p ON ep.project_id = p.id;",
+    "explain": "Preserves all employees. We LEFT JOIN the junction table and project table to keep unassigned employees."
+  },
+  {
+    "id": 36,
+    "q": "List all suppliers and the parts they supply. Include suppliers who do not supply any parts.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT s.name AS supplier_name, p.part_name\nFROM suppliers s\nLEFT JOIN parts p ON s.id = p.supplier_id;",
+    "explain": "Keep all suppliers (Left table), showing NULL part names for suppliers with no catalog parts. Requires a LEFT JOIN."
+  },
+  {
+    "id": 37,
+    "q": "Show parts that have a supplier. Omit parts without an assigned supplier.",
+    "join": "INNER JOIN",
+    "sql": "SELECT p.part_name, s.name AS supplier_name\nFROM parts p\nINNER JOIN suppliers s ON p.supplier_id = s.id;",
+    "explain": "Match parts to suppliers; exclude orphaned parts. Requires a standard INNER JOIN."
+  },
+  {
+    "id": 38,
+    "q": "List all departments and their offices. Include offices that do not host any departments.",
+    "join": "RIGHT JOIN (or LEFT JOIN with table swap)",
+    "sql": "SELECT d.name AS department_name, o.office_number\nFROM departments d\nRIGHT JOIN offices o ON d.office_id = o.id;",
+    "explain": "We need to preserve all offices. Placing offices on the right and using a RIGHT JOIN (or swapping and using LEFT JOIN) accomplishes this."
+  },
+  {
+    "id": 39,
+    "q": "Match students and advisors who share the exact same first name. Return only matches.",
+    "join": "INNER JOIN",
+    "sql": "SELECT s.name AS student, a.name AS advisor\nFROM students s\nINNER JOIN advisors a ON s.first_name = a.first_name;",
+    "explain": "A standard inner join that matches students to advisors on the text condition of first name equality."
+  },
+  {
+    "id": 40,
+    "q": "Compare student enrollment counts. Generate all possible pairs of courses to evaluate overlaps.",
+    "join": "CROSS JOIN",
+    "sql": "SELECT c1.title AS course1, c2.title AS course2\nFROM courses c1\nCROSS JOIN courses c2\nWHERE c1.id < c2.id;",
+    "explain": "A cross join combines all courses. The WHERE condition filters out duplicate matching and matching a course with itself."
+  },
+  {
+    "id": 41,
+    "q": "List all blog posts and their comments. Include posts that have zero comments.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT p.title, c.comment_text\nFROM posts p\nLEFT JOIN comments c ON p.id = c.post_id;",
+    "explain": "Posts must be preserved. Comment-less posts will show NULL for comment text. This is a LEFT JOIN."
+  },
+  {
+    "id": 42,
+    "q": "Show posts that have comments. Exclude posts with no comments.",
+    "join": "INNER JOIN",
+    "sql": "SELECT p.title, c.comment_text\nFROM posts p\nINNER JOIN comments c ON p.id = c.post_id;",
+    "explain": "Strict match. Exclude post rows with no comments. Requires an INNER JOIN."
+  },
+  {
+    "id": 43,
+    "q": "Show all comments and the posts they belong to. Include comments that are not associated with a post.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT c.comment_text, p.title\nFROM comments c\nLEFT JOIN posts p ON c.post_id = p.id;",
+    "explain": "Preserves all comments. Omitted post references will show NULL for post titles. Requires a LEFT JOIN."
+  },
+  {
+    "id": 44,
+    "q": "List all authors and all articles they have co-authored. Include articles with no authors and authors with no articles.",
+    "join": "FULL OUTER JOIN",
+    "sql": "SELECT a.name, art.title\nFROM authors a\nFULL OUTER JOIN articles art ON a.article_id = art.id;",
+    "explain": "Preserves both tables entirely, making FULL OUTER JOIN the required option."
+  },
+  {
+    "id": 45,
+    "q": "Find all tasks in a project. If a task has a prerequisite task, show the prerequisite task title. Include tasks without prerequisites.",
+    "join": "SELF JOIN (LEFT JOIN)",
+    "sql": "SELECT t.title AS task_title, pre.title AS prerequisite_title\nFROM tasks t\nLEFT JOIN tasks pre ON t.prereq_id = pre.id;",
+    "explain": "Since prerequisite details are within the tasks table, we join the table to itself on prereq_id = id. LEFT JOIN keeps tasks with no prerequisites."
+  },
+  {
+    "id": 46,
+    "q": "Find employees and their managers. Exclude employees who don't have a manager.",
+    "join": "SELF JOIN (INNER JOIN)",
+    "sql": "SELECT e.name AS employee_name, m.name AS manager_name\nFROM employees e\nINNER JOIN employees m ON e.manager_id = m.id;",
+    "explain": "Self-join on employee-manager hierarchy. INNER JOIN filters out employees (like the CEO) who have no manager."
+  },
+  {
+    "id": 47,
+    "q": "Generate all possible pairs of team members to form 2-person project teams.",
+    "join": "SELF JOIN (CROSS / INNER JOIN)",
+    "sql": "SELECT m1.name AS member1, m2.name AS member2\nFROM members m1\nINNER JOIN members m2 ON m1.id < m2.id;",
+    "explain": "A self join with ID comparison generates unique pairings of team members without repeats."
+  },
+  {
+    "id": 48,
+    "q": "List all books and their translations. Include books that have not been translated.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT b.title, t.language, t.translated_title\nFROM books b\nLEFT JOIN translations t ON b.id = t.book_id;",
+    "explain": "All books are preserved. Books with no translation rows will show NULL for translation fields. Requires a LEFT JOIN."
+  },
+  {
+    "id": 49,
+    "q": "Show books that have translations. Omit untranslated books.",
+    "join": "INNER JOIN",
+    "sql": "SELECT b.title, t.language, t.translated_title\nFROM books b\nINNER JOIN translations t ON b.id = t.book_id;",
+    "explain": "Only return records that have matching rows in both books and translations. Requires an INNER JOIN."
+  },
+  {
+    "id": 50,
+    "q": "List all transaction accounts and their branches. Include branches without any registered accounts.",
+    "join": "RIGHT JOIN (or LEFT JOIN with table swap)",
+    "sql": "SELECT a.account_number, b.name AS branch_name\nFROM accounts a\nRIGHT JOIN branches b ON a.branch_id = b.id;",
+    "explain": "Branches must be preserved. We use a RIGHT JOIN if branches is on the right, or a LEFT JOIN if we put branches on the left."
+  },
+  {
+    "id": 51,
+    "q": "List all students and advisors. Display matches where possible. Include unassigned students and advisors with no assigned students.",
+    "join": "FULL OUTER JOIN",
+    "sql": "SELECT s.name AS student_name, a.name AS advisor_name\nFROM students s\nFULL OUTER JOIN advisors a ON s.advisor_id = a.id;",
+    "explain": "Requires preservation of both tables (unassigned students and advisors with no students). FULL OUTER JOIN is the correct choice."
+  },
+  {
+    "id": 52,
+    "q": "Find all products that have the exact same weight. Exclude matching a product with itself.",
+    "join": "SELF JOIN",
+    "sql": "SELECT p1.name AS prod1, p2.name AS prod2, p1.weight\nFROM products p1\nINNER JOIN products p2 ON p1.weight = p2.weight AND p1.id < p2.id;",
+    "explain": "Self-join on weight. Using < operator prevents duplicate combinations and matching a product to itself."
+  },
+  {
+    "id": 53,
+    "q": "Create a list of all possible flight itineraries connecting our departure and arrival airports directly.",
+    "join": "CROSS JOIN",
+    "sql": "SELECT a1.code AS departure, a2.code AS arrival\nFROM airports a1\nCROSS JOIN airports a2\nWHERE a1.id <> a2.id;",
+    "explain": "A CROSS JOIN generates all possible departure-arrival combinations. The inequality filters out same-airport flights."
+  },
+  {
+    "id": 54,
+    "q": "Retrieve all customer details along with their discount coupon code. Include customers who do not have a coupon.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT c.name, co.code\nFROM customers c\nLEFT JOIN coupons co ON c.coupon_id = co.id;",
+    "explain": "Preserves all customers. Customers with no discount coupon will show NULL. This is a LEFT JOIN."
+  },
+  {
+    "id": 55,
+    "q": "Find customers who have used a discount coupon. Exclude customers without coupons.",
+    "join": "INNER JOIN",
+    "sql": "SELECT c.name, co.code\nFROM customers c\nINNER JOIN coupons co ON c.coupon_id = co.id;",
+    "explain": "Intersection: only returns customers who hold a valid matching coupon. Requires an INNER JOIN."
+  },
+  {
+    "id": 56,
+    "q": "List all discount coupons and the customers who have redeemed them. Include coupons that have not been redeemed yet.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT co.code, c.name\nFROM coupons co\nLEFT JOIN customers c ON co.id = c.coupon_id;",
+    "explain": "Preserves all coupons. Unredeemed coupons will show NULL for customer name. Requires a LEFT JOIN with coupons as the primary table."
+  },
+  {
+    "id": 57,
+    "q": "Show all users and their profile badges. Include users with no badges and badges that haven't been earned by anyone.",
+    "join": "FULL OUTER JOIN",
+    "sql": "SELECT u.name, b.title AS badge_title\nFROM users u\nFULL OUTER JOIN user_badges ub ON u.id = ub.user_id\nFULL OUTER JOIN badges b ON ub.badge_id = b.id;",
+    "explain": "All users (with or without badges) and all badges (earned or not) must be preserved. Requires FULL OUTER JOINs."
+  },
+  {
+    "id": 58,
+    "q": "Find orders and their items. Exclude orders that contain no items (empty orders) and items not linked to an order.",
+    "join": "INNER JOIN",
+    "sql": "SELECT o.id AS order_id, i.name AS item_name\nFROM orders o\nINNER JOIN order_items oi ON o.id = oi.order_id\nINNER JOIN items i ON oi.item_id = i.id;",
+    "explain": "Standard inner join matching order header to line items to item definitions. Discards unmatched entries."
+  },
+  {
+    "id": 59,
+    "q": "Show all orders and their items. Include orders that have no items listed in the database.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT o.id AS order_id, i.name AS item_name\nFROM orders o\nLEFT JOIN order_items oi ON o.id = oi.order_id\nLEFT JOIN items i ON oi.item_id = i.id;",
+    "explain": "Keep all orders. Left join to order items and item descriptions to ensure empty orders remain in the result."
+  },
+  {
+    "id": 60,
+    "q": "Retrieve all items in inventory and the order IDs they appear in. Include items that have never been ordered.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT i.name AS item_name, oi.order_id\nFROM items i\nLEFT JOIN order_items oi ON i.id = oi.item_id;",
+    "explain": "Preserves all inventory items. Items with no sales history show NULL order IDs, requiring a LEFT JOIN."
+  },
+  {
+    "id": 61,
+    "q": "List all events and their venues. Include events without a venue assigned yet.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT e.title, v.name AS venue_name\nFROM events e\nLEFT JOIN venues v ON e.venue_id = v.id;",
+    "explain": "Keeps all events. Unassigned venues show as NULL. This requires a LEFT JOIN."
+  },
+  {
+    "id": 62,
+    "q": "List all venues and the events hosted in them. Include venues that have no events scheduled.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT v.name AS venue_name, e.title\nFROM venues v\nLEFT JOIN events e ON v.id = e.venue_id;",
+    "explain": "Keeps all venues. Venues with zero events will have NULL event titles. Requires a LEFT JOIN starting with venues."
+  },
+  {
+    "id": 63,
+    "q": "List all events and all venues, displaying matches where possible. Include events without venues and venues with no events.",
+    "join": "FULL OUTER JOIN",
+    "sql": "SELECT e.title, v.name AS venue_name\nFROM events e\nFULL OUTER JOIN venues v ON e.venue_id = v.id;",
+    "explain": "Requires complete preservation of both events and venues, which is the definition of a FULL OUTER JOIN."
+  },
+  {
+    "id": 64,
+    "q": "Show only events that have a venue assigned, along with the venue name.",
+    "join": "INNER JOIN",
+    "sql": "SELECT e.title, v.name AS venue_name\nFROM events e\nINNER JOIN venues v ON e.venue_id = v.id;",
+    "explain": "Only return events that have a valid match in the venues table. Requires an INNER JOIN."
+  },
+  {
+    "id": 65,
+    "q": "Find all users who reside in the same state. Exclude matching a user to themselves.",
+    "join": "SELF JOIN",
+    "sql": "SELECT u1.name AS user1, u2.name AS user2, u1.state\nFROM users u1\nINNER JOIN users u2 ON u1.state = u2.state AND u1.id < u2.id;",
+    "explain": "Self-join on state. The ID comparison avoids self-matching and lists each unique pair once."
+  },
+  {
+    "id": 66,
+    "q": "List all employees and their work office. Include offices that are empty.",
+    "join": "RIGHT JOIN (or LEFT JOIN with table swap)",
+    "sql": "SELECT e.name, o.office_name\nFROM employees e\nRIGHT JOIN offices o ON e.office_id = o.id;",
+    "explain": "Offices must be preserved. Using RIGHT JOIN preserves the right table (offices)."
+  },
+  {
+    "id": 67,
+    "q": "Show all assets and their users. Include assets with no user and users with no assets.",
+    "join": "FULL OUTER JOIN",
+    "sql": "SELECT a.asset_name, u.name\nFROM assets a\nFULL OUTER JOIN users u ON a.user_id = u.id;",
+    "explain": "Preserves both assets and users fully, which requires a FULL OUTER JOIN."
+  },
+  {
+    "id": 68,
+    "q": "List all tasks and the employees assigned. Include tasks that are unassigned.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT t.task_name, e.name\nFROM tasks t\nLEFT JOIN employees e ON t.assigned_to = e.id;",
+    "explain": "Preserves all tasks. Unassigned tasks will show NULL for employee name. Requires a LEFT JOIN."
+  },
+  {
+    "id": 69,
+    "q": "Find tasks that have been assigned. Exclude tasks without an assigned employee.",
+    "join": "INNER JOIN",
+    "sql": "SELECT t.task_name, e.name\nFROM tasks t\nINNER JOIN employees e ON t.assigned_to = e.id;",
+    "explain": "Only show matching tasks and employees. Unassigned tasks are excluded. Requires an INNER JOIN."
+  },
+  {
+    "id": 70,
+    "q": "Retrieve all employees and their tasks. Include employees who have no tasks assigned to them.",
+    "join": "LEFT JOIN (or RIGHT JOIN)",
+    "sql": "SELECT e.name, t.task_name\nFROM employees e\nLEFT JOIN tasks t ON e.id = t.assigned_to;",
+    "explain": "Preserves all employees. Employees with no tasks show NULL for task_name. Requires a LEFT JOIN starting with employees."
+  },
+  {
+    "id": 71,
+    "q": "List all movies and their reviews. Include movies that have not received any reviews.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT m.title, r.rating, r.comment\nFROM movies m\nLEFT JOIN reviews r ON m.id = r.movie_id;",
+    "explain": "Movies must be preserved. Review fields for unreviewed movies will show NULL, indicating a LEFT JOIN."
+  },
+  {
+    "id": 72,
+    "q": "Show only movies that have reviews, along with the reviews.",
+    "join": "INNER JOIN",
+    "sql": "SELECT m.title, r.rating, r.comment\nFROM movies m\nINNER JOIN reviews r ON m.id = r.movie_id;",
+    "explain": "Only return movies that have corresponding records in the reviews table. Requires an INNER JOIN."
+  },
+  {
+    "id": 73,
+    "q": "List all reviews and the movies they belong to. Include orphaned reviews that don't match any movie in the database.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT r.comment, m.title\nFROM reviews r\nLEFT JOIN movies m ON r.movie_id = m.id;",
+    "explain": "All reviews must be preserved. Orphaned reviews will show NULL for movie title. Requires a LEFT JOIN starting with reviews."
+  },
+  {
+    "id": 74,
+    "q": "Show all movies and all reviews, displaying mismatches on both sides.",
+    "join": "FULL OUTER JOIN",
+    "sql": "SELECT m.title, r.comment\nFROM movies m\nFULL OUTER JOIN reviews r ON m.id = r.movie_id;",
+    "explain": "Preserves all movies (even unreviewed) and all reviews (even orphaned). Requires a FULL OUTER JOIN."
+  },
+  {
+    "id": 75,
+    "q": "Generate all possible pairs of movies to create a side-by-side comparison poll.",
+    "join": "CROSS JOIN",
+    "sql": "SELECT m1.title AS movie1, m2.title AS movie2\nFROM movies m1\nCROSS JOIN movies m2\nWHERE m1.id < m2.id;",
+    "explain": "CROSS JOIN yields all movie pairings. The filter eliminates matching a movie to itself and duplicates."
+  },
+  {
+    "id": 76,
+    "q": "Find movies in the database released in the same year. Exclude matching a movie to itself.",
+    "join": "SELF JOIN",
+    "sql": "SELECT m1.title AS movie1, m2.title AS movie2, m1.release_year\nFROM movies m1\nINNER JOIN movies m2 ON m1.release_year = m2.release_year AND m1.id < m2.id;",
+    "explain": "Self-join on release_year. Filters eliminate self-matching and duplicate comparisons."
+  },
+  {
+    "id": 77,
+    "q": "List all customers and their credit cards. Include customers who do not have a credit card.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT c.name, cc.card_number\nFROM customers c\nLEFT JOIN credit_cards cc ON c.id = cc.customer_id;",
+    "explain": "Preserves all customers. Card details for card-less customers show as NULL. Requires a LEFT JOIN."
+  },
+  {
+    "id": 78,
+    "q": "Show only customers who have registered credit cards.",
+    "join": "INNER JOIN",
+    "sql": "SELECT c.name, cc.card_number\nFROM customers c\nINNER JOIN credit_cards cc ON c.id = cc.customer_id;",
+    "explain": "Returns only customers with matching cards. Requires an INNER JOIN."
+  },
+  {
+    "id": 79,
+    "q": "List all credit cards in the system, along with their owner's name. Include cards without a registered customer.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT cc.card_number, c.name\nFROM credit_cards cc\nLEFT JOIN customers c ON cc.customer_id = c.id;",
+    "explain": "Preserves all credit cards. Place credit cards on the left of a LEFT JOIN."
+  },
+  {
+    "id": 80,
+    "q": "Show all customers and all credit cards, including unmatched records on both sides.",
+    "join": "FULL OUTER JOIN",
+    "sql": "SELECT c.name, cc.card_number\nFROM customers c\nFULL OUTER JOIN credit_cards cc ON c.id = cc.customer_id;",
+    "explain": "Preserves both tables entirely, requiring a FULL OUTER JOIN."
+  },
+  {
+    "id": 81,
+    "q": "Match students and courses on the condition that they are in the same department. Return all student-course pairs.",
+    "join": "INNER JOIN",
+    "sql": "SELECT s.name AS student, c.title AS course\nFROM students s\nINNER JOIN courses c ON s.department_id = c.department_id;",
+    "explain": "Standard inner join matching on shared department code. Returns only active matches."
+  },
+  {
+    "id": 82,
+    "q": "Generate all possible course-student combinations for an enrollment survey.",
+    "join": "CROSS JOIN",
+    "sql": "SELECT s.name, c.title\nFROM students s\nCROSS JOIN courses c;",
+    "explain": "A CROSS JOIN yields the complete Cartesian product of students and courses."
+  },
+  {
+    "id": 83,
+    "q": "List all student records, along with their exam grades. Include students who missed exams.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT s.name, g.grade\nFROM students s\nLEFT JOIN grades g ON s.id = g.student_id;",
+    "explain": "Preserves all students. Grade fields for missing exams show as NULL. Requires a LEFT JOIN."
+  },
+  {
+    "id": 84,
+    "q": "Show only student records that have registered exam grades.",
+    "join": "INNER JOIN",
+    "sql": "SELECT s.name, g.grade\nFROM students s\nINNER JOIN grades g ON s.id = g.student_id;",
+    "explain": "Omit students without grades. Requires a standard INNER JOIN."
+  },
+  {
+    "id": 85,
+    "q": "List all exam grades and the students they belong to. Include grades that have no matching student name in the system.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT g.grade, s.name\nFROM grades g\nLEFT JOIN students s ON g.student_id = s.id;",
+    "explain": "Preserves all grades. Place grades on the left of a LEFT JOIN."
+  },
+  {
+    "id": 86,
+    "q": "Show all students and all exam grades, displaying unmatched students and orphaned grades.",
+    "join": "FULL OUTER JOIN",
+    "sql": "SELECT s.name, g.grade\nFROM students s\nFULL OUTER JOIN grades g ON s.id = g.student_id;",
+    "explain": "Preserves both tables fully, requiring a FULL OUTER JOIN."
+  },
+  {
+    "id": 87,
+    "q": "Find students who scored the exact same grade in a course. Exclude matching a student with themselves.",
+    "join": "SELF JOIN",
+    "sql": "SELECT g1.student_id AS stud1, g2.student_id AS stud2, g1.grade\nFROM grades g1\nINNER JOIN grades g2 ON g1.course_id = g2.course_id AND g1.grade = g2.grade AND g1.student_id < g2.student_id;",
+    "explain": "Self-join on course_id and grade. The ID filter filters out self-matching and duplicate records."
+  },
+  {
+    "id": 88,
+    "q": "List all posts and their authors. Include posts written by deleted authors (author is NULL).",
+    "join": "LEFT JOIN",
+    "sql": "SELECT p.title, u.username\nFROM posts p\nLEFT JOIN users u ON p.author_id = u.id;",
+    "explain": "Preserves all posts, making it a LEFT JOIN starting with posts."
+  },
+  {
+    "id": 89,
+    "q": "List all authors and the posts they have written. Include authors who have never written a post.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT u.username, p.title\nFROM users u\nLEFT JOIN posts p ON u.id = p.author_id;",
+    "explain": "Preserves all users/authors, making it a LEFT JOIN starting with users."
+  },
+  {
+    "id": 90,
+    "q": "Show all users and all posts, including posts with no author and authors with no posts.",
+    "join": "FULL OUTER JOIN",
+    "sql": "SELECT u.username, p.title\nFROM users u\nFULL OUTER JOIN posts p ON u.id = p.author_id;",
+    "explain": "Preserves both tables fully, requiring a FULL OUTER JOIN."
+  },
+  {
+    "id": 91,
+    "q": "Find posts and their authors, excluding posts with no author and authors with no posts.",
+    "join": "INNER JOIN",
+    "sql": "SELECT p.title, u.username\nFROM posts p\nINNER JOIN users u ON p.author_id = u.id;",
+    "explain": "Only return strict matches, requiring a standard INNER JOIN."
+  },
+  {
+    "id": 92,
+    "q": "Generate all possible author-post pairings for a user review list.",
+    "join": "CROSS JOIN",
+    "sql": "SELECT u.username, p.title\nFROM users u\nCROSS JOIN posts p;",
+    "explain": "Requires the complete Cartesian product, which is generated via CROSS JOIN."
+  },
+  {
+    "id": 93,
+    "q": "Find duplicate users who signed up using the same email address.",
+    "join": "SELF JOIN",
+    "sql": "SELECT u1.name AS user1, u2.name AS user2, u1.email\nFROM users u1\nINNER JOIN users u2 ON u1.email = u2.email AND u1.id < u2.id;",
+    "explain": "Self-join on email. The ID filter handles self-match exclusions."
+  },
+  {
+    "id": 94,
+    "q": "List all divisions and their stores. Include empty divisions with no stores.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT d.division_name, s.store_name\nFROM divisions d\nLEFT JOIN stores s ON d.id = s.division_id;",
+    "explain": "Keeps all divisions. Division table is on the left of a LEFT JOIN."
+  },
+  {
+    "id": 95,
+    "q": "List all stores and their divisions. Include stores that are not assigned to a division.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT s.store_name, d.division_name\nFROM stores s\nLEFT JOIN divisions d ON s.division_id = d.id;",
+    "explain": "Keeps all stores. Store table is on the left of a LEFT JOIN."
+  },
+  {
+    "id": 96,
+    "q": "Show all divisions and all stores, displaying unmatched divisions and stores together.",
+    "join": "FULL OUTER JOIN",
+    "sql": "SELECT d.division_name, s.store_name\nFROM divisions d\nFULL OUTER JOIN stores s ON d.id = s.division_id;",
+    "explain": "Preserves both tables fully, requiring a FULL OUTER JOIN."
+  },
+  {
+    "id": 97,
+    "q": "Find only stores that belong to a division.",
+    "join": "INNER JOIN",
+    "sql": "SELECT s.store_name, d.division_name\nFROM stores s\nINNER JOIN divisions d ON s.division_id = d.id;",
+    "explain": "Strict matching between stores and divisions. Requires a standard INNER JOIN."
+  },
+  {
+    "id": 98,
+    "q": "Generate all possible pairs of stores to run comparative sales checks.",
+    "join": "CROSS JOIN",
+    "sql": "SELECT s1.store_name AS store1, s2.store_name AS store2\nFROM stores s1\nCROSS JOIN stores s2\nWHERE s1.id < s2.id;",
+    "explain": "CROSS JOIN generates all store combinations. Filter removes self-pairing and duplicates."
+  },
+  {
+    "id": 99,
+    "q": "Find stores located in the same city. Exclude matching a store to itself.",
+    "join": "SELF JOIN",
+    "sql": "SELECT s1.store_name AS store1, s2.store_name AS store2, s1.city\nFROM stores s1\nINNER JOIN stores s2 ON s1.city = s2.city AND s1.id < s2.id;",
+    "explain": "Self-join on city. Filters eliminate self-matching and duplicate comparisons."
+  },
+  {
+    "id": 100,
+    "q": "List all transactions and their payment methods. If a payment method is missing, still display the transaction details.",
+    "join": "LEFT JOIN",
+    "sql": "SELECT t.id AS transaction_id, pm.method_name\nFROM transactions t\nLEFT JOIN payment_methods pm ON t.method_id = pm.id;",
+    "explain": "All transactions must be preserved. Transactions with missing/unmatched payment methods will show NULL, requiring a LEFT JOIN."
+  }
+]
